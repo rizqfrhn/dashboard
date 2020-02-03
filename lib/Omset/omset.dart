@@ -127,6 +127,7 @@ class _Omset extends State<Omset> {
               new Container(
                 child: new Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     new Column(
@@ -252,7 +253,6 @@ class _Omset extends State<Omset> {
 
   Container MtDSection() {
     return Container(
-      margin: EdgeInsets.only(top: 10.0),
       padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
       decoration: new BoxDecoration(
         color: Colors.lightBlue,
@@ -287,7 +287,7 @@ class _Omset extends State<Omset> {
                 color: Colors.white),*/
             Text('Target : ${FlutterMoneyFormatter(amount: target).compactNonSymbol}', style: TextStyle(color: Colors.white)),
             SizedBox(height: 10.0),
-            Text('Realisasi : ${FlutterMoneyFormatter(amount: target).compactNonSymbol}', style: TextStyle(color: Colors.white)),
+            Text('Realisasi : ${FlutterMoneyFormatter(amount: realisasi).compactNonSymbol}', style: TextStyle(color: Colors.white)),
           ],
         ),
       ),
