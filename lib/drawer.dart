@@ -26,11 +26,11 @@ class MyDrawer extends StatefulWidget {
 
   final drawerItem = [
     new DrawerItem("Omset", Icons.show_chart),
-    new DrawerItem("Chart", Icons.insert_chart),
+    /*new DrawerItem("Chart", Icons.insert_chart),
     new DrawerItem("Dashboard", Icons.dashboard),
     new DrawerItem("Json", Icons.desktop_windows),
     new DrawerItem("Table", Icons.table_chart),
-    new DrawerItem("Setting", Icons.settings),
+    new DrawerItem("Setting", Icons.settings),*/
     new DrawerItem("Logout", Icons.exit_to_app),
 
   ];
@@ -46,7 +46,7 @@ class _MyDrawer extends State<MyDrawer> {
     switch (pos) {
       case 0:
         return Omset(nik: widget.nik);
-      case 1:
+      /*case 1:
         return Chart();
       case 2:
         return Dashboard();
@@ -55,7 +55,7 @@ class _MyDrawer extends State<MyDrawer> {
       case 4:
         return MyTable();
       case 5:
-        return MySetting();
+        return MySetting();*/
 
       default:
         return new Text("Error");

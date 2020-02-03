@@ -51,7 +51,7 @@ class FlutterMoneyFormatter {
   }
 }
 
-Widget value_({String value1, String value2, String separator, Color color}) {
+/*Widget value_({String value1, String value2, String separator, Color color}) {
   return new Container(
     child: new Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -65,7 +65,7 @@ Widget value_({String value1, String value2, String separator, Color color}) {
         ]
     ),
   );
-}
+}*/
 
 //OMSET//
 

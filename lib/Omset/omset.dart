@@ -102,7 +102,7 @@ class _Omset extends State<Omset> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: new AppBar(
         /*title: appBarTitle,*/
         flexibleSpace: new Container(
           decoration: BoxDecoration(
@@ -115,6 +115,7 @@ class _Omset extends State<Omset> {
         actions: <Widget>[
           _appBar(),
         ],
+        leading: new Container(),
       ),
       body: loading ? Center(child: CircularProgressIndicator()) :
       RefreshIndicator(
@@ -123,16 +124,21 @@ class _Omset extends State<Omset> {
           child: ListView(
             padding: const EdgeInsets.all(20.0),
             children: <Widget>[
-              MtDSection(),
               new Container(
                 child: new Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      liquidChart(),
-                      new Container(width: 8.0),
-                      OrderSOToko(),
-                    ]
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    new Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          MtDSection(),
+                          liquidChart(),
+                        ]
+                    ),
+                    OrderSOToko(),
+                  ],
                 ),
               ),
               dataOmset(),
@@ -229,7 +235,7 @@ class _Omset extends State<Omset> {
                                             fontWeight: FontWeight.bold))
                                 ),
                               ),
-                              makeRadioTiles()
+                              makeRadioTiles(),
                             ],
                           ),
                         ),
@@ -246,6 +252,7 @@ class _Omset extends State<Omset> {
 
   Container MtDSection() {
     return Container(
+      margin: EdgeInsets.only(top: 10.0),
       padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
       decoration: new BoxDecoration(
         color: Colors.lightBlue,
@@ -254,7 +261,7 @@ class _Omset extends State<Omset> {
           topLeft: Radius.circular(5),
           topRight: Radius.circular(5),
           bottomLeft: Radius.circular(5),
-          bottomRight: Radius.circular(30),),
+          bottomRight: Radius.circular(5),),
         boxShadow: <BoxShadow>[
           new BoxShadow(
             color: Colors.black12,
@@ -263,27 +270,26 @@ class _Omset extends State<Omset> {
           ),
         ],
       ),
-      child: Column(
-        children: <Widget>[
-          Text('Month to Date', style: TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-          /*SizedBox(height: 20.0),*/
-          Divider(
-            height: 21,
-            color: Colors.white,
-          ),
-          value_(value1: 'Target',
-              value2: FlutterMoneyFormatter(amount: target).compactNonSymbol,
-              separator: ':',
-              color: Colors.white),
-          /*Text('Target : Rp. ${numformat.format(target)}', style: TextStyle(color: Colors.white)),*/
-          SizedBox(height: 10.0),
-          value_(value1: 'Realisasi',
-              value2: FlutterMoneyFormatter(amount: realisasi).compactNonSymbol,
-              separator: ':',
-              color: Colors.white),
-          /*Text('Realisasi : Rp. ${numformat.format(realisasi)}', style: TextStyle(color: Colors.white)),*/
-        ],
+      child: Container(
+        width: MediaQuery.of(context).size.width / 3.5,
+        child: Column(
+          children: <Widget>[
+            Text('Month to Date', style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            /*SizedBox(height: 20.0),*/
+            Divider(
+              height: 21,
+              color: Colors.white,
+            ),
+            /*value_(value1: 'Target',
+                value2: FlutterMoneyFormatter(amount: target).compactNonSymbol,
+                separator: ':',
+                color: Colors.white),*/
+            Text('Target : ${FlutterMoneyFormatter(amount: target).compactNonSymbol}', style: TextStyle(color: Colors.white)),
+            SizedBox(height: 10.0),
+            Text('Realisasi : ${FlutterMoneyFormatter(amount: target).compactNonSymbol}', style: TextStyle(color: Colors.white)),
+          ],
+        ),
       ),
     );
   }
@@ -291,11 +297,12 @@ class _Omset extends State<Omset> {
   Container liquidChart() {
     return Container(
       /*margin: EdgeInsets.only(top: 50.0),*/
-      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 30.0),
+      margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
+      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
       child: Center(
         child: SizedBox(
-          width: 150.0,
-          height: 150.0,
+          width: MediaQuery.of(context).size.width / 3.0,
+          height: MediaQuery.of(context).size.height / 6.0,
           child: LiquidCircularProgressIndicator(
             value: persentase / 100 <= 0.0 ? 0.0 :
             persentase / 100 >= 1.0 ? 1.0 :
@@ -343,9 +350,9 @@ class _Omset extends State<Omset> {
         ],
       ),
       child: Center(
-        child: SizedBox(
-          width: 150.0,
-          height: 100.0,
+        child: Container(
+          width: MediaQuery.of(context).size.width / 3.5,
+          height: MediaQuery.of(context).size.height / 3.0,
           child: Column(
             children: <Widget>[
               Text('Distribusi Toko', style: TextStyle(fontSize: 18,
@@ -356,16 +363,10 @@ class _Omset extends State<Omset> {
                 height: 21,
                 color: Colors.white,
               ),
-              value_(value1: '${numformat.format(totalOrderSO)}',
-                  value2: '${numformat.format(totalToko)}',
-                  separator: '/',
-                  color: Colors.white),
-              /*Text('Realisasi : Rp. ${numformat.format(realisasi)}', style: TextStyle(color: Colors.white)),*/
-              SizedBox(height: 7.0),
+              Text('${numformat.format(totalOrderSO)} / ${numformat.format(totalToko)}', style: TextStyle(color: Colors.white)),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
+                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                 child: new LinearPercentIndicator(
-                  width: 100,
                   animation: true,
                   lineHeight: 20.0,
                   animationDuration: 2000,
@@ -467,12 +468,11 @@ class _Omset extends State<Omset> {
               color: darkBlue,
             ),
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: brandlist.length,
-            itemBuilder: (context, index) {
-              final x = brandlist[index];
-              return Card(
+          Container(
+          child: Column(
+          children: [
+            for ( var i in brandlist )
+              Card(
                 shape: RoundedRectangleBorder( borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(5),
                   topRight: Radius.circular(5),
@@ -484,23 +484,19 @@ class _Omset extends State<Omset> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(x.jenis_merk, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),),
+                      Text(i.jenis_merk, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),),
                       Divider(
                         height: 11,
                         color: Colors.white,
                       ),
-                      value_(value1: 'Omset', value2: FlutterMoneyFormatter(amount: x.omset).compactNonSymbol,
-                          separator: ':',
-                          color: Colors.white),
+                      Text('Omset : ${FlutterMoneyFormatter(amount: i.omset).compactNonSymbol}', style: TextStyle(color: Colors.white)),
                       SizedBox(height: 5.0),
-                      value_(value1: 'Berat', value2: '${(x.berat / 1000).toStringAsFixed(2)} Ton',
-                          separator: ':',
-                          color: Colors.white),
+                      Text('Berat : ${(i.berat / 1000).toStringAsFixed(2)} Ton', style: TextStyle(color: Colors.white)),
                     ],
                   ),
                 ),
-              );
-            },
+              ),
+            ],),
           ),
         ]
     );
