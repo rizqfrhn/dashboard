@@ -302,7 +302,7 @@ class _Omset extends State<Omset> {
       child: Center(
         child: SizedBox(
           width: MediaQuery.of(context).size.width / 3.0,
-          height: MediaQuery.of(context).size.height / 6.0,
+          height: MediaQuery.of(context).size.width / 3.0,
           child: LiquidCircularProgressIndicator(
             value: persentase / 100 <= 0.0 ? 0.0 :
             persentase / 100 >= 1.0 ? 1.0 :
@@ -394,6 +394,7 @@ class _Omset extends State<Omset> {
 
   Widget dataOmset() {
     return PaginatedDataTable(
+
       header: new Text('${monthFormat} ${yearFormat}'),
       rowsPerPage: _rowsPerPage,
       onRowsPerPageChanged: (int value) {
