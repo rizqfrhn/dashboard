@@ -1,7 +1,7 @@
 /*import 'package:dashboard/Login/Login.dart';*/
 //import 'package:dashboard/Login/loginauth.dart';
 import 'Login/signin.dart';
-import 'package:mobilesfa/Omset/omset.dart';
+import 'package:dashboard/Omset/omset.dart';
 import 'UI/json.dart';
 import 'UI/setting.dart';
 import 'UI/chart.dart';

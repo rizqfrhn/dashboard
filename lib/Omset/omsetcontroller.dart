@@ -15,22 +15,11 @@ import 'package:percent_indicator/percent_indicator.dart';
 //GENERAL//
 
 class FlutterMoneyFormatter {
-  FlutterMoneyFormatter({/*@required this.symbol,*/
-    @required this.amount,
-    /*@required this.fractionDigits*/}) {
-    /*this.symbol = this.symbol ?? '\$';
-    this.fractionDigits = this.fractionDigits ?? 2;*/
-    String output = compactNonSymbol;
-  }
+  FlutterMoneyFormatter({@required this.amount,}){}
 
-  // The [symbol] that will be used on formatted output, default value is $ (Dollar Sign)
-  /*String symbol;*/
   double amount;
-  // The fraction digits that will be used on formatted output, default value is 2.
-  /*int fractionDigits;*/
 
-
-  String get compactNonSymbol {
+  String get compact {
     String compacted = NumberFormat.compact(locale: "in").format(amount);
     return 'Rp. $compacted';
     /*String numerics = RegExp(r'(\d+\.\d+)|(\d+)')
@@ -48,6 +37,10 @@ class FlutterMoneyFormatter {
         .format(num.parse(numerics));
 
     return '$reformat $alphas';*/
+  }
+  String get compactNonSymbol {
+    String compacted = NumberFormat.compact(locale: "in").format(amount);
+    return '$compacted';
   }
 }
 
@@ -176,12 +169,12 @@ class OmsetDataSource extends DataTableSource {
           context,
           MaterialPageRoute(builder: (context) => OmsetArea(nama_regional: omset.nama_regional, nik: nik, periode: periode,)),
         );}/*Text('${omset.persentase_bulan.toStringAsFixed(2)}')*/),
-        DataCell(Text(FlutterMoneyFormatter(amount: omset.target_omset).compactNonSymbol), onTap: () {Navigator.push(
+        DataCell(Text(FlutterMoneyFormatter(amount: omset.target_omset).compact), onTap: () {Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => OmsetArea(nama_regional: omset.nama_regional, nik: nik, periode: periode,)),
         );}),
         /*DataCell(Text('${omset.target_volume.toStringAsFixed(0)}')),*/
-        DataCell(Text(FlutterMoneyFormatter(amount: omset.net_exc_ppn).compactNonSymbol), onTap: () {Navigator.push(
+        DataCell(Text(FlutterMoneyFormatter(amount: omset.net_exc_ppn).compact), onTap: () {Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => OmsetArea(nama_regional: omset.nama_regional, nik: nik, periode: periode,)),
         );}),
@@ -380,7 +373,7 @@ class OmsetAreaDataSource extends DataTableSource {
             );
             }
         ),
-        DataCell(Text(FlutterMoneyFormatter(amount: omsetArea.target_value).compactNonSymbol), onTap: () { Navigator.push(
+        DataCell(Text(FlutterMoneyFormatter(amount: omsetArea.target_value).compact), onTap: () { Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => OmsetSales(
             areaKey: omsetArea.area_key,
@@ -389,7 +382,7 @@ class OmsetAreaDataSource extends DataTableSource {
             periode: periode,)),
         );}),
         /*DataCell(Text('${omset.target_volume.toStringAsFixed(0)}')),*/
-        DataCell(Text(FlutterMoneyFormatter(amount: omsetArea.net_exc_ppn).compactNonSymbol), onTap: () { Navigator.push(
+        DataCell(Text(FlutterMoneyFormatter(amount: omsetArea.net_exc_ppn).compact), onTap: () { Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => OmsetSales(
             areaKey: omsetArea.area_key,
@@ -518,7 +511,7 @@ class OmsetSalesDataSource extends DataTableSource {
               salesName: omsetSales.nama_sales)),
         );}
         ),
-        DataCell(Text(FlutterMoneyFormatter(amount: omsetSales.target_value).compactNonSymbol), onTap: () { Navigator.push(
+        DataCell(Text(FlutterMoneyFormatter(amount: omsetSales.target_value).compact), onTap: () { Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => OmsetToko(
               areaKey: areaKey,
@@ -528,7 +521,7 @@ class OmsetSalesDataSource extends DataTableSource {
               salesName: omsetSales.nama_sales)),
         );}),
         /*DataCell(Text('${omset.target_volume.toStringAsFixed(0)}')),*/
-        DataCell(Text(FlutterMoneyFormatter(amount: omsetSales.net_exc_ppn).compactNonSymbol), onTap: () { Navigator.push(
+        DataCell(Text(FlutterMoneyFormatter(amount: omsetSales.net_exc_ppn).compact), onTap: () { Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => OmsetToko(
               areaKey: areaKey,
@@ -568,7 +561,7 @@ class OmsetSalesDataSource extends DataTableSource {
               salesName: omsetSales.nama_sales)),
         );}
         ),
-        DataCell(Text(FlutterMoneyFormatter(amount: omsetSales.target_tagih).compactNonSymbol), onTap: () { Navigator.push(
+        DataCell(Text(FlutterMoneyFormatter(amount: omsetSales.target_tagih).compact), onTap: () { Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => OmsetToko(
               areaKey: areaKey,
@@ -577,7 +570,7 @@ class OmsetSalesDataSource extends DataTableSource {
               nikSales: omsetSales.nik,
               salesName: omsetSales.nama_sales)),
         );}),
-        DataCell(Text(FlutterMoneyFormatter(amount: omsetSales.total_bayar).compactNonSymbol), onTap: () { Navigator.push(
+        DataCell(Text(FlutterMoneyFormatter(amount: omsetSales.total_bayar).compact), onTap: () { Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => OmsetToko(
               areaKey: areaKey,
@@ -692,9 +685,9 @@ class OmsetTokoDataSource extends DataTableSource {
             ),
           ),
         ),
-        DataCell(Text(FlutterMoneyFormatter(amount: omsetToko.target_value).compactNonSymbol)),
+        DataCell(Text(FlutterMoneyFormatter(amount: omsetToko.target_value).compact)),
         /*DataCell(Text('${omset.target_volume.toStringAsFixed(0)}')),*/
-        DataCell(Text(FlutterMoneyFormatter(amount: omsetToko.net_exc_ppn).compactNonSymbol)),
+        DataCell(Text(FlutterMoneyFormatter(amount: omsetToko.net_exc_ppn).compact)),
       ],
     );
   }

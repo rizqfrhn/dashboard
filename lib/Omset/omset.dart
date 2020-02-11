@@ -125,7 +125,7 @@ class _Omset extends State<Omset> {
             padding: const EdgeInsets.all(20.0),
             children: <Widget>[
               new Container(
-                child: new Row(
+                child: new Row( 
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -134,15 +134,31 @@ class _Omset extends State<Omset> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          MtDSection(),
-                          liquidChart(),
+                          DetailOmset('Omset', 4412300000.0, 1412300000.0, 50.0),
+                          DetailOmset('Omset Hari', 4412300000.0, 1412300000.0, 50.0),
+                          DetailOmset('Tagihan', 44262300000.0, 1412300000.0, 50.0),
+                          DetailOmset('Tagihan Hari', 4412300000.0, 1412300000.0, 50.0),
+                          /*MtDSection(),*/
                         ]
                     ),
-                    OrderSOToko(),
+                    new Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          DetailOmset('SO FK', 4412300000.0, 1412300000.0, 100.0),
+                          DetailOmset('SO SJ', 4412300000.0, 1412300000.0, 50.0),
+                          OrderSOToko(),
+                        ]
+                    ),
                   ],
                 ),
               ),
+              liquidChart(),
               dataOmset(),
+              SizedBox(
+                height: 15.0,
+              ),
+              avgData(),
               SizedBox(
                 height: 15.0,
               ),
@@ -251,9 +267,12 @@ class _Omset extends State<Omset> {
     );
   }
 
-  Container MtDSection() {
+  Container DetailOmset(String title_, double value1_, double value2_, double persentase_) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+      alignment: Alignment.center,
+      margin: EdgeInsets.only(bottom: 10.0),
+      width: MediaQuery.of(context).size.width * 0.43,
+      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
       decoration: new BoxDecoration(
         color: Colors.lightBlue,
         shape: BoxShape.rectangle,
@@ -271,7 +290,122 @@ class _Omset extends State<Omset> {
         ],
       ),
       child: Container(
-        width: MediaQuery.of(context).size.width / 3.5,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(title_, style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            SizedBox(
+              height: 7.5,
+            ),
+            Wrap(
+              spacing: 5.0,
+              runSpacing: 5.0,
+              children: <Widget>[
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text('Target',
+                        style: TextStyle(color: Colors.white)),
+                    SizedBox(
+                      height: 5.0,
+                    ),
+                    Text('${FlutterMoneyFormatter(amount: value1_).compactNonSymbol}',
+                        style: TextStyle(color: Colors.white)),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text('Real',
+                        style: TextStyle(color: Colors.white)),
+                    SizedBox(
+                      height: 5.0,
+                    ),
+                    Text('${FlutterMoneyFormatter(amount: value2_).compactNonSymbol}',
+                        style: TextStyle(color: Colors.white)),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text('%',
+                        style: TextStyle(color: Colors.white)),
+                    SizedBox(
+                      height: 5.0,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.15,
+                      child: new LinearPercentIndicator(
+                        width: 60,
+                        alignment: MainAxisAlignment.center,
+                        animation: true,
+                        lineHeight: 20.0,
+                        animationDuration: 2000,
+                        percent: 1.0,
+                        center: Text('${persentase_.toStringAsFixed(2)}', style: TextStyle(color: Colors.white)),
+                        linearStrokeCap: LinearStrokeCap.roundAll,
+                        progressColor: persentase_ <= 80 ? Colors.red :
+                        persentase_ <= 90 ? Colors.orange :
+                        Colors.green,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 7.5,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+              child: new LinearPercentIndicator(
+                animation: true,
+                backgroundColor: Colors.white,
+                lineHeight: 2.0,
+                animationDuration: 2000,
+                percent: persentase_ / 100 <= 0.0 ? 0.0 :
+                persentase_ / 100 >= 1.0 ? 1.0 :
+                persentase_ / 100,
+                linearStrokeCap: LinearStrokeCap.roundAll,
+                progressColor: persentase_ <= 80 ? Colors.red :
+                persentase_ <= 90 ? Colors.orange :
+                Colors.green,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Container MtDSection() {
+    return Container(
+      alignment: Alignment.center,
+      margin: EdgeInsets.only(bottom: 10.0),
+      width: MediaQuery.of(context).size.width / 2.3,
+      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+      decoration: new BoxDecoration(
+        color: Colors.lightBlue,
+        shape: BoxShape.rectangle,
+        borderRadius: new BorderRadius.only(
+          topLeft: Radius.circular(5),
+          topRight: Radius.circular(5),
+          bottomLeft: Radius.circular(5),
+          bottomRight: Radius.circular(5),),
+        boxShadow: <BoxShadow>[
+          new BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10.0,
+            offset: new Offset(0.0, 10.0),
+          ),
+        ],
+      ),
+      child: Container(
         child: Column(
           children: <Widget>[
             Text('Month to Date', style: TextStyle(
@@ -282,12 +416,13 @@ class _Omset extends State<Omset> {
               color: Colors.white,
             ),
             /*value_(value1: 'Target',
-                value2: FlutterMoneyFormatter(amount: target).compactNonSymbol,
+                value2: FlutterMoneyFormatter(amount: target).compact,
                 separator: ':',
                 color: Colors.white),*/
-            Text('Target : ${FlutterMoneyFormatter(amount: target).compactNonSymbol}', style: TextStyle(color: Colors.white)),
+            Text('Target : ${FlutterMoneyFormatter(amount: target).compact}', style: TextStyle(color: Colors.white)),
             SizedBox(height: 10.0),
-            Text('Realisasi : ${FlutterMoneyFormatter(amount: realisasi).compactNonSymbol}', style: TextStyle(color: Colors.white)),
+            Text('Realisasi : ${FlutterMoneyFormatter(amount: realisasi).compact}',
+                style: TextStyle(color: Colors.white)),
           ],
         ),
       ),
@@ -296,8 +431,7 @@ class _Omset extends State<Omset> {
 
   Container liquidChart() {
     return Container(
-      /*margin: EdgeInsets.only(top: 50.0),*/
-      margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
+      /*margin: EdgeInsets.only(top: 10.0, bottom: 10.0),*/
       padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
       child: Center(
         child: SizedBox(
@@ -331,7 +465,10 @@ class _Omset extends State<Omset> {
 
   Container OrderSOToko() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+      alignment: Alignment.center,
+      margin: EdgeInsets.only(bottom: 10.0),
+      width: MediaQuery.of(context).size.width / 2.3,
+      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
       decoration: new BoxDecoration(
         color: Colors.lightBlue,
         shape: BoxShape.rectangle,
@@ -351,8 +488,6 @@ class _Omset extends State<Omset> {
       ),
       child: Center(
         child: Container(
-          width: MediaQuery.of(context).size.width / 3.5,
-          height: MediaQuery.of(context).size.height / 3.0,
           child: Column(
             children: <Widget>[
               Text('Distribusi Toko', style: TextStyle(fontSize: 18,
@@ -449,6 +584,137 @@ class _Omset extends State<Omset> {
     );
   }
 
+  Widget avgData() {
+    return new Column(
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: Text("Ratio",
+              style: Theme.of(context)
+                  .textTheme
+                  .title
+                  .apply(color: darkBlue, fontWeightDelta: 2),
+              ),
+          ),
+          Container(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: Divider(
+              height: 31,
+              color: darkBlue,
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(bottom: 10.0),
+            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+            width: MediaQuery.of(context).size.width * 0.95,
+            decoration: new BoxDecoration(
+              color: Colors.lightBlue,
+              shape: BoxShape.rectangle,
+              borderRadius: new BorderRadius.only(
+                topLeft: Radius.circular(5),
+                topRight: Radius.circular(5),
+                bottomLeft: Radius.circular(5),
+                bottomRight: Radius.circular(5),),
+              boxShadow: <BoxShadow>[
+                new BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10.0,
+                  offset: new Offset(0.0, 10.0),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Wrap(
+                alignment: WrapAlignment.spaceAround,
+                spacing: 5.0,
+                runSpacing: 5.0,
+                children: <Widget>[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('',
+                          style: TextStyle(color: Colors.white)),
+                      SizedBox(height: 10.0),
+                      Text('Target',
+                          style: TextStyle(color: Colors.white)),
+                      Text('Rata-rata Call',
+                          style: TextStyle(color: Colors.white)),
+                      Text('Rata-rata EC',
+                          style: TextStyle(color: Colors.white)),
+                      Text('Rata-rata Invoice',
+                          style: TextStyle(color: Colors.white)),
+                      Text('Jumlah Sales',
+                          style: TextStyle(color: Colors.white)),
+                      Text('Estimasi Tercapai',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Text('',
+                          style: TextStyle(color: Colors.white)),
+                      SizedBox(height: 10.0),
+                      Text(':',
+                          style: TextStyle(color: Colors.white)),
+                      Text(':',
+                          style: TextStyle(color: Colors.white)),
+                      Text(':',
+                          style: TextStyle(color: Colors.white)),
+                      Text(':',
+                          style: TextStyle(color: Colors.white)),
+                      Text(':',
+                          style: TextStyle(color: Colors.white)),
+                      Text(':',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Text('Avg (3 Months)', style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                      SizedBox(height: 10.0),
+                      Text('${0}',
+                          style: TextStyle(color: Colors.white)),
+                      Text('${0}',
+                          style: TextStyle(color: Colors.white)),
+                      Text('${0}',
+                          style: TextStyle(color: Colors.white)),
+                      Text('${0}',
+                          style: TextStyle(color: Colors.white)),
+                      Text('${654} M',
+                          style: TextStyle(color: Colors.white)),
+                      Text('${0}',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Text('MTD', style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                      SizedBox(height: 10.0),
+                      Text('${0}',
+                          style: TextStyle(color: Colors.white)),
+                      Text('${0}',
+                          style: TextStyle(color: Colors.white)),
+                      Text('${0}',
+                          style: TextStyle(color: Colors.white)),
+                      Text('${0}',
+                          style: TextStyle(color: Colors.white)),
+                      Text('${654} M',
+                          style: TextStyle(color: Colors.white)),
+                      Text('${0}',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+    );
+  }
+
   Widget brandView(){
     return new Column(
         mainAxisSize: MainAxisSize.min,
@@ -470,34 +736,52 @@ class _Omset extends State<Omset> {
             ),
           ),
           Container(
-          child: Column(
-          children: [
-            for ( var i in brandlist )
-              Card(
-                shape: RoundedRectangleBorder( borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(5),
-                  topRight: Radius.circular(5),
-                  bottomLeft: Radius.circular(5),
-                  bottomRight: Radius.circular(30),)),
-                color: Colors.lightBlue,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(i.jenis_merk, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),),
-                      Divider(
-                        height: 11,
-                        color: Colors.white,
-                      ),
-                      Text('Omset : ${FlutterMoneyFormatter(amount: i.omset).compactNonSymbol}', style: TextStyle(color: Colors.white)),
-                      SizedBox(height: 5.0),
-                      Text('Berat : ${(i.berat / 1000).toStringAsFixed(2)} Ton', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
+            alignment: Alignment.center,
+            margin: EdgeInsets.only(bottom: 10.0),
+            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+            width: MediaQuery.of(context).size.width * 0.95,
+            decoration: new BoxDecoration(
+              color: Colors.lightBlue,
+              shape: BoxShape.rectangle,
+              borderRadius: new BorderRadius.only(
+                topLeft: Radius.circular(5),
+                topRight: Radius.circular(5),
+                bottomLeft: Radius.circular(5),
+                bottomRight: Radius.circular(30),
               ),
-            ],),
+              boxShadow: <BoxShadow>[
+                new BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10.0,
+                  offset: new Offset(0.0, 10.0),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                for ( var i in brandlist )
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Center(
+                            child: Text(i.jenis_merk,
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),)
+                        ),
+                        Divider(
+                          height: 11,
+                          color: Colors.white,
+                        ),
+                        Text('Omset : ${FlutterMoneyFormatter(amount: i.omset).compact}',
+                            style: TextStyle(color: Colors.white)),
+                        SizedBox(height: 5.0),
+                        Text('Berat : ${(i.berat / 1000).toStringAsFixed(2)} Ton', style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+                  ),
+                ],
+            ),
           ),
         ]
     );
