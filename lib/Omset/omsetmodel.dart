@@ -1,3 +1,5 @@
+// Omset
+
 class OmsetModel {
   final String urut;
   final String nama_regional;
@@ -35,13 +37,21 @@ class OmsetTotalModel {
   final double target_volume;
   final double net_exc_ppn;
   final double persentase;
+  final double target_omset_hari;
+  final double target_volume_hari;
+  final double net_exc_ppn_hari;
+  final double persentase_hari;
 
   bool selected = false;
 
   OmsetTotalModel({ this.target_omset
     , this.target_volume
     , this.net_exc_ppn
-    , this.persentase});
+    , this.persentase
+    , this.target_omset_hari
+    , this.target_volume_hari
+    , this.net_exc_ppn_hari
+    , this.persentase_hari});
 
   factory OmsetTotalModel.fromJson(Map<String, dynamic> json) {
     return new OmsetTotalModel(
@@ -49,9 +59,131 @@ class OmsetTotalModel {
       target_volume: json['target_volume'] == null ? 0 : json['target_volume'].toDouble(),
       net_exc_ppn: json['net_exc_ppn'] == null ? 0 : json['net_exc_ppn'].toDouble(),
       persentase: json['persentase'] == null ? 0 : json['persentase'].toDouble(),
+      target_omset_hari: json['target_omset_hari'] == null ? 0 : json['target_omset_hari'].toDouble(),
+      target_volume_hari: json['target_volume_hari'] == null ? 0 : json['target_volume_hari'].toDouble(),
+      net_exc_ppn_hari: json['net_exc_ppn_hari'] == null ? 0 : json['net_exc_ppn_hari'].toDouble(),
+      persentase_hari: json['persentase_hari'] == null ? 0 : json['persentase_hari'].toDouble(),
     );
   }
 }
+
+class OmsetSOModel {
+  final String kode_periode;
+  final double so;
+  final double sj;
+  final double fk;
+  final double persentase_kirim;
+  final double persentase_faktur;
+
+  bool selected = false;
+
+  OmsetSOModel({ this.kode_periode
+    , this.so
+    , this.sj
+    , this.fk
+    , this.persentase_kirim
+    , this.persentase_faktur});
+
+  factory OmsetSOModel.fromJson(Map<String, dynamic> json) {
+    return new OmsetSOModel(
+      kode_periode: json['kode_periode'],
+      so: json['so'] == null ? 0 : json['so'].toDouble(),
+      sj: json['sj'] == null ? 0 : json['sj'].toDouble(),
+      fk: json['fk'] == null ? 0 : json['fk'].toDouble(),
+      persentase_kirim: json['persentase_kirim'] == null ? 0 : json['persentase_kirim'].toDouble(),
+      persentase_faktur: json['persentase_faktur'] == null ? 0 : json['persentase_faktur'].toDouble(),
+    );
+  }
+}
+
+class PeriodeModel {
+  final String kode_periode;
+  final String TAHUN;
+  final String BULAN;
+  final String KODE_PERIODE1;
+
+  bool selected = false;
+
+  PeriodeModel({ this.kode_periode
+    , this.TAHUN
+    , this.BULAN
+    , this.KODE_PERIODE1});
+
+  factory PeriodeModel.fromJson(Map<String, dynamic> json) {
+    return new PeriodeModel(
+      kode_periode: json['kode_periode'],
+      TAHUN: json['TAHUN'],
+      BULAN: json['BULAN'],
+      KODE_PERIODE1: json['KODE_PERIODE1'],
+    );
+  }
+}
+
+class TokoModel {
+  final double total;
+  final double total_order_so;
+  final double persentase;
+
+  bool selected = false;
+
+  TokoModel({ this.total
+    , this.total_order_so
+    , this.persentase});
+
+  factory TokoModel.fromJson(Map<String, dynamic> json) {
+    return new TokoModel(
+      total: json['total'] == null ? 0 : json['total'].toDouble(),
+      total_order_so: json['total_order_so'] == null ? 0 : json['total_order_so'].toDouble(),
+      persentase: json['persentase'] == null ? 0 : json['persentase'].toDouble(),
+    );
+  }
+}
+
+class BrandModel {
+  final String kode_jenis_merk;
+  final double jumlah_toko;
+  final String jenis_merk;
+  final double jumlah;
+  final double omset;
+  final double berat;
+  final double nomor;
+  final double jumlah_toko_last_year;
+  final double omset_last_year;
+  final double total_toko_mtd;
+  final double total_toko_last_year;
+
+  bool selected = false;
+
+  BrandModel({ this.kode_jenis_merk
+    , this.jumlah_toko
+    , this.jenis_merk
+    , this.jumlah
+    , this.omset
+    , this.berat
+    , this.nomor
+    , this.jumlah_toko_last_year
+    , this.omset_last_year
+    , this.total_toko_mtd
+    , this.total_toko_last_year});
+
+  factory BrandModel.fromJson(Map<String, dynamic> json) {
+    return new BrandModel(
+      kode_jenis_merk: json['kode_jenis_merk'],
+      jumlah_toko: json['jumlah_toko'] == null ? 0 : json['jumlah_toko'].toDouble(),
+      jenis_merk: json['jenis_merk'],
+      jumlah: json['jumlah'] == null ? 0 : json['jumlah'].toDouble(),
+      omset: json['omset'] == null ? 0 : json['omset'].toDouble(),
+      berat: json['berat'] == null ? 0 : json['berat'].toDouble(),
+      nomor: json['nomor'] == null ? 0 : json['nomor'].toDouble(),
+      jumlah_toko_last_year: json['jumlah_toko_last_year'] == null ? 0 : json['jumlah_toko_last_year'].toDouble(),
+      omset_last_year: json['omset_last_year'] == null ? 0 : json['omset_last_year'].toDouble(),
+      total_toko_mtd: json['total_toko_mtd'] == null ? 0 : json['total_toko_mtd'].toDouble(),
+      total_toko_last_year: json['total_toko_last_year'] == null ? 0 : json['total_toko_last_year'].toDouble(),
+    );
+  }
+}
+
+// Omset Area
 
 class OmsetAreaModel {
   final String kode_periode;
@@ -93,6 +225,8 @@ class OmsetAreaModel {
     );
   }
 }
+
+// Omset Sales
 
 class OmsetSalesModel {
   final String kode_periode;
@@ -168,6 +302,8 @@ class OmsetSalesModel {
   }
 }
 
+// Omset Toko
+
 class OmsetTokoModel {
   final String nik;
   final String kode_pelanggan;
@@ -202,69 +338,6 @@ class OmsetTokoModel {
       net_exc_ppn: json['net_exc_ppn'] == null ? 0 : json['net_exc_ppn'].toDouble(),
       persentase_omset: json['persentase_omset'] == null ? 0 : json['persentase_omset'].toDouble(),
       nomor: json['nomor'].toDouble() == null ? 0 : json['nomor'].toDouble(),
-    );
-  }
-}
-
-class PeriodeModel {
-  final String kode_periode;
-  final String TAHUN;
-  final String BULAN;
-  final String KODE_PERIODE1;
-
-  bool selected = false;
-
-  PeriodeModel({ this.kode_periode
-    , this.TAHUN
-    , this.BULAN
-    , this.KODE_PERIODE1});
-
-  factory PeriodeModel.fromJson(Map<String, dynamic> json) {
-    return new PeriodeModel(
-      kode_periode: json['kode_periode'],
-      TAHUN: json['TAHUN'],
-      BULAN: json['BULAN'],
-      KODE_PERIODE1: json['KODE_PERIODE1'],
-    );
-  }
-}
-
-class TokoModel {
-  final double total;
-  final double total_order_so;
-  final double persentase;
-
-  bool selected = false;
-
-  TokoModel({ this.total
-    , this.total_order_so
-    , this.persentase});
-
-  factory TokoModel.fromJson(Map<String, dynamic> json) {
-    return new TokoModel(
-      total: json['total'] == null ? 0 : json['total'].toDouble(),
-      total_order_so: json['total_order_so'] == null ? 0 : json['total_order_so'].toDouble(),
-      persentase: json['persentase'] == null ? 0 : json['persentase'].toDouble(),
-    );
-  }
-}
-
-class BrandModel {
-  final String jenis_merk;
-  final double omset;
-  final double berat;
-
-  bool selected = false;
-
-  BrandModel({ this.jenis_merk
-    , this.omset
-    , this.berat});
-
-  factory BrandModel.fromJson(Map<String, dynamic> json) {
-    return new BrandModel(
-      jenis_merk: json['jenis_merk'],
-      omset: json['omset'] == null ? 0 : json['omset'].toDouble(),
-      berat: json['berat'] == null ? 0 : json['berat'].toDouble(),
     );
   }
 }

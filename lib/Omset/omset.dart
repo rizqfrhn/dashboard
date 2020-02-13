@@ -38,7 +38,7 @@ class _Omset extends State<Omset> {
 
   AnimationController _animationController;
   OmsetDataSource _omsetDataSource = OmsetDataSource([], null, null, null);
-  var loading = false;
+  bool loading = false;
   var refreshKey = GlobalKey<RefreshIndicatorState>();
   PeriodeModel periodeSelection;
   String periode = 'O${year}${month}';
@@ -52,10 +52,9 @@ class _Omset extends State<Omset> {
 
   Future<void> _fetchData(String periode) async {
     final result = await fetchResultOmset(http.Client(), nik, periode);
-    if (!isLoaded) {
+    if (!loading) {
       setState(() {
         _omsetDataSource = OmsetDataSource(result, nik, periode, context);
-        bool isLoaded = true;
       });
     }
   }
@@ -65,13 +64,11 @@ class _Omset extends State<Omset> {
     // TODO: implement initState
     super.initState();
 
-    _fetchData(periode);
-    fetchDataTotal(nik, periode);
-    fetchBrand(nik, periode);
-    fetchToko(nik, periode);
-    fetchDataPeriode();
-    periodeSelection = null;
-    /*refreshList();*/
+    setState(() {
+      loading = true;
+      refreshList();
+      periodeSelection = null;
+    });
 
   }
 
@@ -81,10 +78,12 @@ class _Omset extends State<Omset> {
 
     setState(() {
       _fetchData(periode);
-      fetchDataTotal(nik, periode);
+      fetchData(nik, periode);
+      /*fetchDataSO(nik, periode);
       fetchBrand(nik, periode);
       fetchToko(nik, periode);
-      fetchDataPeriode();
+      fetchDataPeriode();*/
+      loading = false;
     });
 
     return null;
@@ -134,10 +133,10 @@ class _Omset extends State<Omset> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          DetailOmset('Omset', 4412300000.0, 1412300000.0, 50.0),
-                          DetailOmset('Omset Hari', 4412300000.0, 1412300000.0, 50.0),
-                          DetailOmset('Tagihan', 44262300000.0, 1412300000.0, 50.0),
-                          DetailOmset('Tagihan Hari', 4412300000.0, 1412300000.0, 50.0),
+                          DetailOmset('Omset', 'Target', 'Real', target, realisasi, persentase),
+                          DetailOmset('Omset Hari', 'Target', 'Real', target_hari, realisasi_hari, persentase_hari),
+                          DetailOmset('Tagihan', 'Target', 'Real', 44262300000.0, 1412300000.0, 50.0),
+                          DetailOmset('Tagihan Hari', 'Target', 'Real', 4412300000.0, 1412300000.0, 50.0),
                           /*MtDSection(),*/
                         ]
                     ),
@@ -145,8 +144,8 @@ class _Omset extends State<Omset> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          DetailOmset('SO FK', 4412300000.0, 1412300000.0, 100.0),
-                          DetailOmset('SO SJ', 4412300000.0, 1412300000.0, 50.0),
+                          DetailOmset('SO FK', 'SO', 'FK', so, fk, persentase_faktur),
+                          DetailOmset('SO SJ', 'SO', 'SJ', so, sj, persentase_kirim),
                           OrderSOToko(),
                         ]
                     ),
@@ -187,9 +186,10 @@ class _Omset extends State<Omset> {
             yearFormat = new DateFormat("yyyy").format(DateTime.parse
               ('${listperiode.TAHUN}-${listperiode.BULAN}-01'));
             _fetchData(periode);
-            fetchDataTotal(nik, periode);
+            fetchData(nik, periode);
+            /*fetchDataSO(nik, periode);
             fetchBrand(nik, periode);
-            fetchToko(nik, periode);
+            fetchToko(nik, periode);*/
             Navigator.of(context).pop();
           });
         },
@@ -267,11 +267,12 @@ class _Omset extends State<Omset> {
     );
   }
 
-  Container DetailOmset(String title_, double value1_, double value2_, double persentase_) {
+  Container DetailOmset(String title_, String subtitle1_, String subtitle2_,
+      double value1_, double value2_, double persentase_) {
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.only(bottom: 10.0),
-      width: MediaQuery.of(context).size.width * 0.43,
+      width: MediaQuery.of(context).size.width * 0.42,
       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
       decoration: new BoxDecoration(
         color: Colors.lightBlue,
@@ -307,7 +308,7 @@ class _Omset extends State<Omset> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text('Target',
+                    Text(subtitle1_,
                         style: TextStyle(color: Colors.white)),
                     SizedBox(
                       height: 5.0,
@@ -320,7 +321,7 @@ class _Omset extends State<Omset> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text('Real',
+                    Text(subtitle2_,
                         style: TextStyle(color: Colors.white)),
                     SizedBox(
                       height: 5.0,
@@ -341,7 +342,7 @@ class _Omset extends State<Omset> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.15,
                       child: new LinearPercentIndicator(
-                        width: 60,
+                        width: MediaQuery.of(context).size.width * 0.15,
                         alignment: MainAxisAlignment.center,
                         animation: true,
                         lineHeight: 20.0,
@@ -387,7 +388,7 @@ class _Omset extends State<Omset> {
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.only(bottom: 10.0),
-      width: MediaQuery.of(context).size.width / 2.3,
+      width: MediaQuery.of(context).size.width * 0.42,
       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
       decoration: new BoxDecoration(
         color: Colors.lightBlue,
@@ -467,7 +468,7 @@ class _Omset extends State<Omset> {
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.only(bottom: 10.0),
-      width: MediaQuery.of(context).size.width / 2.3,
+      width: MediaQuery.of(context).size.width * 0.42,
       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
       decoration: new BoxDecoration(
         color: Colors.lightBlue,
@@ -762,7 +763,55 @@ class _Omset extends State<Omset> {
                 for ( var i in brandlist )
                   Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: Column(
+                    child:  Wrap(
+                      alignment: WrapAlignment.spaceAround,
+                      spacing: 5.0,
+                      runSpacing: 5.0,
+                      children: <Widget>[
+                        Center(
+                            child: Text(i.jenis_merk,
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),)
+                        ),
+                        Divider(
+                          height: 11,
+                          color: Colors.white,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text('Omset',
+                                style: TextStyle(color: Colors.white)),
+                            Text('Sebaran 1 Tahun Lalu',
+                                style: TextStyle(color: Colors.white)),
+                            Text('Sebaran MTD',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
+                        Column(
+                          children: <Widget>[
+                            Text(':',
+                                style: TextStyle(color: Colors.white)),
+                            Text(':',
+                                style: TextStyle(color: Colors.white)),
+                            Text(':',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text('${FlutterMoneyFormatter(amount: i.omset).compact}',
+                                style: TextStyle(color: Colors.white)),
+                            Text('${i.jumlah_toko_last_year.toStringAsFixed(0)} Toko / '
+                                '${i.total_toko_last_year.toStringAsFixed(0)} Toko',
+                                style: TextStyle(color: Colors.white)),
+                            Text('${i.jumlah_toko.toStringAsFixed(0)} Toko / '
+                                '${i.total_toko_mtd.toStringAsFixed(0)} Toko',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
+                      ],
+                    ),/*Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Center(
@@ -778,7 +827,7 @@ class _Omset extends State<Omset> {
                         SizedBox(height: 5.0),
                         Text('Berat : ${(i.berat / 1000).toStringAsFixed(2)} Ton', style: TextStyle(color: Colors.white)),
                       ],
-                    ),
+                    ),*/
                   ),
                 ],
             ),
