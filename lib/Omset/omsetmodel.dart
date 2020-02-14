@@ -183,6 +183,38 @@ class BrandModel {
   }
 }
 
+class OmsetTagihModel {
+  final String kode;
+  final double target_tagih;
+  final double total_bayar;
+  final double persentase;
+  final double target_hari;
+  final double total_bayar_hari;
+  final double persentase_hari;
+
+  bool selected = false;
+
+  OmsetTagihModel({ this.kode
+    , this.target_tagih
+    , this.total_bayar
+    , this.persentase
+    , this.target_hari
+    , this.total_bayar_hari
+    , this.persentase_hari});
+
+  factory OmsetTagihModel.fromJson(Map<String, dynamic> json) {
+    return new OmsetTagihModel(
+      kode: json['kode'],
+      target_tagih: json['target_tagih'] == null ? 0 : json['target_tagih'].toDouble(),
+      total_bayar: json['total_bayar'] == null ? 0 : json['total_bayar'].toDouble(),
+      persentase: json['persentase'] == null ? 0 : json['persentase'].toDouble(),
+      target_hari: json['target_hari'] == null ? 0 : json['target_hari'].toDouble(),
+      total_bayar_hari: json['total_bayar_hari'] == null ? 0 : json['total_bayar_hari'].toDouble(),
+      persentase_hari: json['persentase_hari'] == null ? 0 : json['persentase_hari'].toDouble(),
+    );
+  }
+}
+
 // Omset Area
 
 class OmsetAreaModel {

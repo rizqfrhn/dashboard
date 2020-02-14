@@ -134,9 +134,9 @@ class _Omset extends State<Omset> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           DetailOmset('Omset', 'Target', 'Real', target, realisasi, persentase),
-                          DetailOmset('Omset Hari', 'Target', 'Real', target_hari, realisasi_hari, persentase_hari),
-                          DetailOmset('Tagihan', 'Target', 'Real', 44262300000.0, 1412300000.0, 50.0),
-                          DetailOmset('Tagihan Hari', 'Target', 'Real', 4412300000.0, 1412300000.0, 50.0),
+                          DetailOmset('Omset Hari', 'Target', 'Real', targetHari, realisasiHari, persentaseHari),
+                          DetailOmset('Tagihan', 'Target', 'Real', targetTagihan, totalBayar, persentaseTagihan),
+                          DetailOmset('Tagihan Hari', 'Target', 'Real', targetTagihanHari, totalBayarHari, persentaseTagihanHari),
                           /*MtDSection(),*/
                         ]
                     ),
@@ -187,9 +187,6 @@ class _Omset extends State<Omset> {
               ('${listperiode.TAHUN}-${listperiode.BULAN}-01'));
             _fetchData(periode);
             fetchData(nik, periode);
-            /*fetchDataSO(nik, periode);
-            fetchBrand(nik, periode);
-            fetchToko(nik, periode);*/
             Navigator.of(context).pop();
           });
         },

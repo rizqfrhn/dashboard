@@ -22,21 +22,6 @@ class FlutterMoneyFormatter {
   String get compact {
     String compacted = NumberFormat.compact(locale: "in").format(amount);
     return 'Rp. $compacted';
-    /*String numerics = RegExp(r'(\d+\.\d+)|(\d+)')
-        .allMatches(compacted)
-        .map((_) => _.group(0))
-        .toString()
-        .replaceAll('(', '')
-        .replaceAll(')', '');
-
-    String alphas = compacted.replaceAll(numerics, '');
-
-    String reformat = NumberFormat.currency(
-        symbol: symbol,
-        decimalDigits: numerics.indexOf('.') == -1 ? 0 : fractionDigits)
-        .format(num.parse(numerics));
-
-    return '$reformat $alphas';*/
   }
   String get compactNonSymbol {
     String compacted = NumberFormat.compact(locale: "in").format(amount);
@@ -44,26 +29,11 @@ class FlutterMoneyFormatter {
   }
 }
 
-/*Widget value_({String value1, String value2, String separator, Color color}) {
-  return new Container(
-    child: new Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          new Text(value1, style: TextStyle(color: color)),
-          new Container(width: 8.0),
-          new Text(separator, style: TextStyle(color: color)),
-          new Container(width: 8.0),
-          new Text(value2, style: TextStyle(color: color)),
-        ]
-    ),
-  );
-}*/
-
-//OMSET//
+// OMSET //
 
 List<OmsetTotalModel> list = [];
 List<OmsetSOModel> listSO = [];
+List<OmsetTagihModel> listTagihan = [];
 List<PeriodeModel> periodelist = [];
 List<BrandModel> brandlist = [];
 List<TokoModel> Tokolist = [];
@@ -73,9 +43,9 @@ PeriodeModel periodeSelection;
 double target = 0;
 double realisasi = 0;
 double persentase = 0;
-double target_hari = 0;
-double realisasi_hari = 0;
-double persentase_hari = 0;
+double targetHari = 0;
+double realisasiHari = 0;
+double persentaseHari = 0;
 double so = 0;
 double sj = 0;
 double fk = 0;
@@ -84,6 +54,12 @@ double persentase_faktur = 0;
 double totalToko = 0;
 double totalOrderSO = 0;
 double persentaseToko = 0;
+double targetTagihan = 0;
+double totalBayar = 0;
+double persentaseTagihan = 0;
+double targetTagihanHari = 0;
+double totalBayarHari = 0;
+double persentaseTagihanHari = 0;
 
 Future<List<OmsetModel>> fetchResultOmset(http.Client client, String nik, String periode) async {
   Map data = {
@@ -97,11 +73,9 @@ Future<List<OmsetModel>> fetchResultOmset(http.Client client, String nik, String
   final response =
   await client.post('${url}/GetDataOmsetRegionalGabung?', body: data);
 
-  // Use the compute function to run parsePhotos in a separate isolate.
   return compute(parseOmset, response.body);
 }
 
-// A function that converts a response body into a List<Photo>.
 List<OmsetModel> parseOmset(String responseBody) {
   final parsed = jsonDecode(responseBody)['Table'].cast<Map<String, dynamic>>();
 
@@ -209,6 +183,7 @@ class OmsetDataSource extends DataTableSource {
 }
 
 fetchData(String nik, String periode) async {
+// Detail Omset & Tagihan
   Map dataOmset = {
     'lokasi': '',
     'tahun': '',
@@ -228,11 +203,28 @@ fetchData(String nik, String periode) async {
     target = list[0].target_omset;
     realisasi = list[0].net_exc_ppn;
     persentase = list[0].persentase;
-    target_hari = list[0].target_omset_hari;
-    realisasi_hari = list[0].net_exc_ppn_hari;
-    persentase_hari = list[0].persentase_hari;
+    targetHari = list[0].target_omset_hari;
+    realisasiHari = list[0].net_exc_ppn_hari;
+    persentaseHari = list[0].persentase_hari;
   }
 
+  var responseTagihan =
+  await http.post(
+      '${url}/GetWidgetDashboardTagihanTotal?',
+      body: dataOmset);
+  if (responseTagihan.statusCode == 200) {
+    listTagihan = (json.decode(responseTagihan.body)['Table'] as List)
+        .map((data) => new OmsetTagihModel.fromJson(data))
+        .toList();
+    targetTagihan = listTagihan[0].target_tagih;
+    totalBayar = listTagihan[0].total_bayar;
+    persentaseTagihan = listTagihan[0].persentase;
+    targetTagihanHari = listTagihan[0].target_hari;
+    totalBayarHari = listTagihan[0].total_bayar_hari;
+    persentaseTagihanHari = listTagihan[0].persentase_hari;
+  }
+
+// Detail SO & Brand
   Map data = {
     'lokasi': '',
     'nik': nik,
@@ -264,6 +256,7 @@ fetchData(String nik, String periode) async {
         .toList();
   }
 
+// Detail Toko
   Map dataToko = {
     'lokasi': '',
     'periode': periode,
@@ -284,6 +277,7 @@ fetchData(String nik, String periode) async {
     persentaseToko = Tokolist[0].persentase;
   }
 
+// Periode
   var responsePeriode =
   await http.post(
       '${url}/GetDataPeriode');
@@ -394,7 +388,7 @@ fetchDataPeriode() async {
   }
 }*/
 
-//OMSET AREA//
+// OMSET AREA //
 
 Future<List<OmsetAreaModel>> fetchResultArea(
     http.Client client, String regional, String nik, String periode) async {
@@ -409,11 +403,9 @@ Future<List<OmsetAreaModel>> fetchResultArea(
       '${url}/GetWidgetDashboardNewOmsetArea?',
       body: data);
 
-  // Use the compute function to run parsePhotos in a separate isolate.
   return compute(parseOmsetArea, response.body);
 }
 
-// A function that converts a response body into a List<Photo>.
 List<OmsetAreaModel> parseOmsetArea(String responseBody) {
   final parsed = jsonDecode(responseBody)['Table'].cast<Map<String, dynamic>>();
 
@@ -531,7 +523,7 @@ class OmsetAreaDataSource extends DataTableSource {
   }
 }
 
-//OMSET SALES//
+// OMSET SALES //
 
 Future<List<OmsetSalesModel>> fetchResultSales(
     http.Client client, String regional, String nik, String periode) async {
@@ -545,11 +537,9 @@ Future<List<OmsetSalesModel>> fetchResultSales(
       '${url}/GetDetailOmsetSales?',
       body: data);
 
-  // Use the compute function to run parsePhotos in a separate isolate.
   return compute(parseOmsetSales, response.body);
 }
 
-// A function that converts a response body into a List<Photo>.
 List<OmsetSalesModel> parseOmsetSales(String responseBody) {
   final parsed = jsonDecode(responseBody)['Table'].cast<Map<String, dynamic>>();
 
@@ -720,7 +710,7 @@ class OmsetSalesDataSource extends DataTableSource {
   }
 }
 
-//OMSET TOKO//
+// OMSET TOKO //
 
 Future<List<OmsetTokoModel>> fetchResultToko(
     http.Client client, String regional, String nik, String periode, String nikSales) async {
@@ -735,11 +725,9 @@ Future<List<OmsetTokoModel>> fetchResultToko(
       '${url}/GetDetailOmsetSalesToko?',
       body: data);
 
-  // Use the compute function to run parsePhotos in a separate isolate.
   return compute(parseOmsetToko, response.body);
 }
 
-// A function that converts a response body into a List<Photo>.
 List<OmsetTokoModel> parseOmsetToko(String responseBody) {
   final parsed = jsonDecode(responseBody)['Table'].cast<Map<String, dynamic>>();
 
