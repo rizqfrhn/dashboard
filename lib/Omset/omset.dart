@@ -163,10 +163,10 @@ class _Omset extends State<Omset> {
                   ],
                 ),
               ),
-              lineChart(),
+              /*lineChart(),
               SizedBox(
                 height: 15,
-              ),
+              ),*/
               lineChart_(),
               SizedBox(
                 height: 15,
@@ -609,7 +609,7 @@ class _Omset extends State<Omset> {
                         padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 15.0, bottom: 0.0),
                         child: AnimatedLineChart(
                           LineChart.fromDateTimeMaps(
-                              [createLine2(), createLine2_2()], [Colors.greenAccent, Colors.lightBlueAccent],['', '']),
+                              [lineSO(), lineSJ()], [Colors.greenAccent, Colors.lightBlueAccent],['', '']),
                           key: UniqueKey(),
                         ), //Unique key to force animations
                       )

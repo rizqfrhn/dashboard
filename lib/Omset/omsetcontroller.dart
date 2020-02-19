@@ -540,7 +540,7 @@ List<LineChartBarData> linesBarData() {
   ];
 }
 
-Map<DateTime, double> createLine2() {
+Map<DateTime, double> lineSO() {
   Map<DateTime, double> data = {};
 
   for ( var i in listBrand )
@@ -550,7 +550,19 @@ Map<DateTime, double> createLine2() {
   return data;
 }
 
-Map<DateTime, double> createLine2_2() {
+Map<DateTime, double> lineSJ() {
+  Map<DateTime, double> data = {};
+  data[DateTime.now().subtract(Duration(days: 7))] = 30.0;
+  data[DateTime.now().subtract(Duration(days: 6))] = 48.0;
+  data[DateTime.now().subtract(Duration(days: 5))] = 67.0;
+  data[DateTime.now().subtract(Duration(days: 4))] = 99.0;
+  data[DateTime.now().subtract(Duration(days: 3))] = 23.0;
+  data[DateTime.now().subtract(Duration(days: 2))] = 47.0;
+  data[DateTime.now().subtract(Duration(days: 1))] = 10.0;
+  return data;
+}
+
+Map<DateTime, double> lineTagihan() {
   Map<DateTime, double> data = {};
   data[DateTime.now().subtract(Duration(days: 7))] = 30.0;
   data[DateTime.now().subtract(Duration(days: 6))] = 48.0;
