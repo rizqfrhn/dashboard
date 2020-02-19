@@ -11,6 +11,7 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 //GENERAL//
 
@@ -34,32 +35,251 @@ class FlutterMoneyFormatter {
 List<OmsetTotalModel> list = [];
 List<OmsetSOModel> listSO = [];
 List<OmsetTagihModel> listTagihan = [];
-List<PeriodeModel> periodelist = [];
-List<BrandModel> brandlist = [];
-List<TokoModel> Tokolist = [];
-var loading = false;
+List<PeriodeModel> listPeriode = [];
+List<BrandModel> listBrand = [];
+List<TokoModel> listToko = [];
+List<OmsetCallECModel> listCallEC = [];
+bool loading = false;
 var refreshKey = GlobalKey<RefreshIndicatorState>();
 PeriodeModel periodeSelection;
-double target = 0;
-double realisasi = 0;
-double persentase = 0;
-double targetHari = 0;
-double realisasiHari = 0;
-double persentaseHari = 0;
-double so = 0;
-double sj = 0;
-double fk = 0;
-double persentase_kirim = 0;
-double persentase_faktur = 0;
-double totalToko = 0;
-double totalOrderSO = 0;
-double persentaseToko = 0;
-double targetTagihan = 0;
-double totalBayar = 0;
-double persentaseTagihan = 0;
-double targetTagihanHari = 0;
-double totalBayarHari = 0;
-double persentaseTagihanHari = 0;
+double target = 0, realisasi = 0, persentase = 0,
+    targetHari = 0, realisasiHari = 0, persentaseHari = 0;
+double so = 0, sj = 0, fk = 0, persentase_kirim = 0, persentase_faktur = 0;
+double totalToko = 0, totalOrderSO = 0, persentaseToko = 0;
+double targetTagihan = 0, totalBayar = 0, persentaseTagihan = 0,
+    targetTagihanHari = 0, totalBayarHari = 0, persentaseTagihanHari = 0;
+double targetOmset = 0, rataCall = 0, rataEC = 0,
+    rataFk = 0, jumlahSales = 0, estimasiPersentase = 0;
+double targetOmsetLast = 0, rataCallLast = 0, rataECLast = 0,
+    rataFkLast = 0, jumlahSalesLast = 0, estimasiPersentaseLast = 0;
+
+fetchData(String nik, String periode) async {
+// Detail Omset & Tagihan
+  Map dataOmset = {
+    'lokasi': '',
+    'tahun': '',
+    'minggu': '',
+    'nik': nik,
+    'periode': periode
+  };
+
+  var response =
+  await http.post(
+      '${url}/GetWidgetDashboardNewOmsetAreaTotal?',
+      body: dataOmset);
+  if (response.statusCode == 200) {
+    list = (json.decode(response.body)['Table'] as List)
+        .map((data) => new OmsetTotalModel.fromJson(data))
+        .toList();
+    target = list[0].target_omset;
+    realisasi = list[0].net_exc_ppn;
+    persentase = list[0].persentase;
+    targetHari = list[0].target_omset_hari;
+    realisasiHari = list[0].net_exc_ppn_hari;
+    persentaseHari = list[0].persentase_hari;
+  }
+
+  var responseTagihan =
+  await http.post(
+      '${url}/GetWidgetDashboardTagihanTotal?',
+      body: dataOmset);
+  if (responseTagihan.statusCode == 200) {
+    listTagihan = (json.decode(responseTagihan.body)['Table'] as List)
+        .map((data) => new OmsetTagihModel.fromJson(data))
+        .toList();
+    targetTagihan = listTagihan[0].target_tagih;
+    totalBayar = listTagihan[0].total_bayar;
+    persentaseTagihan = listTagihan[0].persentase;
+    targetTagihanHari = listTagihan[0].target_hari;
+    totalBayarHari = listTagihan[0].total_bayar_hari;
+    persentaseTagihanHari = listTagihan[0].persentase_hari;
+  }
+
+// Detail SO, Brand & CallEC
+  Map dataParam = {
+    'lokasi': '',
+    'nik': nik,
+    'periode': periode
+  };
+
+  var responseSO =
+  await http.post(
+      '${url}/GetWidgetOrder?',
+      body: dataParam);
+  if (responseSO.statusCode == 200) {
+    listSO = (json.decode(responseSO.body)['Table'] as List)
+        .map((data) => new OmsetSOModel.fromJson(data))
+        .toList();
+    so = listSO[0].so;
+    sj = listSO[0].sj;
+    fk = listSO[0].fk;
+    persentase_kirim = listSO[0].persentase_kirim;
+    persentase_faktur = listSO[0].persentase_faktur;
+  }
+
+  var responseBrand =
+  await http.post(
+      '${url}/GetDataBrandPareto?',
+      body: dataParam);
+  if (responseBrand.statusCode == 200) {
+    listBrand = (json.decode(responseBrand.body)['Table'] as List)
+        .map((data) => new BrandModel.fromJson(data))
+        .toList();
+  }
+
+  var responseCallEC =
+  await http.post(
+      '${url}/GetWidgetCallEc?',
+      body: dataParam);
+  if (responseCallEC.statusCode == 200) {
+    listCallEC = (json.decode(responseCallEC.body)['Table'] as List)
+        .map((data) => new OmsetCallECModel.fromJson(data))
+        .toList();
+    targetOmset = listCallEC[0].target_omset;
+    rataCall = listCallEC[0].rata_call;
+    rataEC = listCallEC[0].rata_ec;
+    rataFk = listCallEC[0].rata_fk;
+    jumlahSales = listCallEC[0].jumlah_sales;
+    estimasiPersentase = listCallEC[0].estimasi_persentase;
+    targetOmsetLast = listCallEC[0].target_omset_last;
+    rataCallLast = listCallEC[0].rata_call_last;
+    rataECLast = listCallEC[0].rata_ec_last;
+    rataFkLast = listCallEC[0].rata_fk_last;
+    jumlahSalesLast = listCallEC[0].jumlah_sales_last;
+    estimasiPersentaseLast = listCallEC[0].estimasi_persentase_last;
+  }
+
+// Detail Toko
+  Map dataToko = {
+    'lokasi': '',
+    'periode': periode,
+    'nik': nik,
+    'nikSales' : ''
+  };
+
+  var responseToko =
+  await http.post(
+      '${url}/GetDataPersentaseToko?',
+      body: dataToko);
+  if (responseToko.statusCode == 200) {
+    listToko = (json.decode(responseToko.body)['Table'] as List)
+        .map((data) => new TokoModel.fromJson(data))
+        .toList();
+    totalToko = listToko[0].total;
+    totalOrderSO = listToko[0].total_order_so;
+    persentaseToko = listToko[0].persentase;
+  }
+
+// Periode
+  var responsePeriode =
+  await http.post(
+      '${url}/GetDataPeriode');
+  if (responsePeriode.statusCode == 200) {
+    listPeriode = (json.decode(responsePeriode.body)['Table'] as List)
+        .map((data) => new PeriodeModel.fromJson(data))
+        .toList();
+  }
+}
+
+/*fetchDataTotal(String nik, String periode) async {
+  Map data = {
+    'lokasi': '',
+    'tahun': '',
+    'minggu': '',
+    'nik': nik,
+    'periode': periode
+  };
+
+  var response =
+  await http.post(
+      '${url}/GetWidgetDashboardNewOmsetAreaTotal?',
+      body: data);
+  if (response.statusCode == 200) {
+    list = (json.decode(response.body)['Table'] as List)
+        .map((data) => new OmsetTotalModel.fromJson(data))
+        .toList();
+    target = list[0].target_omset;
+    realisasi = list[0].net_exc_ppn;
+    persentase = list[0].persentase;
+    target_hari = list[0].target_omset_hari;
+    realisasi_hari = list[0].net_exc_ppn_hari;
+    persentase_hari = list[0].persentase_hari;
+  }
+}
+
+fetchDataSO(String nik, String periode) async {
+  Map data = {
+    'lokasi': '',
+    'nik': nik,
+    'periode': periode
+  };
+
+  var response =
+  await http.post(
+      '${url}/GetWidgetOrder?',
+      body: data);
+  if (response.statusCode == 200) {
+    listSO = (json.decode(response.body)['Table'] as List)
+        .map((data) => new OmsetSOModel.fromJson(data))
+        .toList();
+    so = listSO[0].so;
+    sj = listSO[0].sj;
+    fk = listSO[0].fk;
+    persentase_kirim = listSO[0].persentase_kirim;
+    persentase_faktur = listSO[0].persentase_faktur;
+  }
+}
+
+fetchToko(String nik, String periode) async {
+  Map data = {
+    'lokasi': '',
+    'periode': periode,
+    'nik': nik,
+    'nikSales' : ''
+  };
+
+  var response =
+  await http.post(
+      '${url}/GetDataPersentaseToko?',
+      body: data);
+  if (response.statusCode == 200) {
+    orderSOlist = (json.decode(response.body)['Table'] as List)
+        .map((data) => new TokoModel.fromJson(data))
+        .toList();
+    totalToko = orderSOlist[0].total;
+    totalOrderSO = orderSOlist[0].total_order_so;
+    persentaseToko = orderSOlist[0].persentase;
+  }
+}
+
+fetchBrand(String nik, String periode) async {
+  Map data = {
+    'lokasi': '',
+    'periode': periode,
+    'nik': nik
+  };
+
+  var response =
+  await http.post(
+      '${url}/GetDataBrandPareto?',
+      body: data);
+  if (response.statusCode == 200) {
+    brandlist = (json.decode(response.body)['Table'] as List)
+        .map((data) => new BrandModel.fromJson(data))
+        .toList();
+  }
+}
+
+fetchDataPeriode() async {
+  var response =
+  await http.post(
+      '${url}/GetDataPeriode');
+  if (response.statusCode == 200) {
+    periodelist = (json.decode(response.body)['Table'] as List)
+        .map((data) => new PeriodeModel.fromJson(data))
+        .toList();
+  }
+}*/
 
 Future<List<OmsetModel>> fetchResultOmset(http.Client client, String nik, String periode) async {
   Map data = {
@@ -182,211 +402,165 @@ class OmsetDataSource extends DataTableSource {
   }
 }
 
-fetchData(String nik, String periode) async {
-// Detail Omset & Tagihan
-  Map dataOmset = {
-    'lokasi': '',
-    'tahun': '',
-    'minggu': '',
-    'nik': nik,
-    'periode': periode
-  };
-
-  var response =
-  await http.post(
-      '${url}/GetWidgetDashboardNewOmsetAreaTotal?',
-      body: dataOmset);
-  if (response.statusCode == 200) {
-    list = (json.decode(response.body)['Table'] as List)
-        .map((data) => new OmsetTotalModel.fromJson(data))
-        .toList();
-    target = list[0].target_omset;
-    realisasi = list[0].net_exc_ppn;
-    persentase = list[0].persentase;
-    targetHari = list[0].target_omset_hari;
-    realisasiHari = list[0].net_exc_ppn_hari;
-    persentaseHari = list[0].persentase_hari;
-  }
-
-  var responseTagihan =
-  await http.post(
-      '${url}/GetWidgetDashboardTagihanTotal?',
-      body: dataOmset);
-  if (responseTagihan.statusCode == 200) {
-    listTagihan = (json.decode(responseTagihan.body)['Table'] as List)
-        .map((data) => new OmsetTagihModel.fromJson(data))
-        .toList();
-    targetTagihan = listTagihan[0].target_tagih;
-    totalBayar = listTagihan[0].total_bayar;
-    persentaseTagihan = listTagihan[0].persentase;
-    targetTagihanHari = listTagihan[0].target_hari;
-    totalBayarHari = listTagihan[0].total_bayar_hari;
-    persentaseTagihanHari = listTagihan[0].persentase_hari;
-  }
-
-// Detail SO & Brand
-  Map data = {
-    'lokasi': '',
-    'nik': nik,
-    'periode': periode
-  };
-
-  var responseSO =
-  await http.post(
-      '${url}/GetWidgetOrder?',
-      body: data);
-  if (responseSO.statusCode == 200) {
-    listSO = (json.decode(responseSO.body)['Table'] as List)
-        .map((data) => new OmsetSOModel.fromJson(data))
-        .toList();
-    so = listSO[0].so;
-    sj = listSO[0].sj;
-    fk = listSO[0].fk;
-    persentase_kirim = listSO[0].persentase_kirim;
-    persentase_faktur = listSO[0].persentase_faktur;
-  }
-
-  var responseBrand =
-  await http.post(
-      '${url}/GetDataBrandPareto?',
-      body: data);
-  if (responseBrand.statusCode == 200) {
-    brandlist = (json.decode(responseBrand.body)['Table'] as List)
-        .map((data) => new BrandModel.fromJson(data))
-        .toList();
-  }
-
-// Detail Toko
-  Map dataToko = {
-    'lokasi': '',
-    'periode': periode,
-    'nik': nik,
-    'nikSales' : ''
-  };
-
-  var responseToko =
-  await http.post(
-      '${url}/GetDataPersentaseToko?',
-      body: dataToko);
-  if (responseToko.statusCode == 200) {
-    Tokolist = (json.decode(responseToko.body)['Table'] as List)
-        .map((data) => new TokoModel.fromJson(data))
-        .toList();
-    totalToko = Tokolist[0].total;
-    totalOrderSO = Tokolist[0].total_order_so;
-    persentaseToko = Tokolist[0].persentase;
-  }
-
-// Periode
-  var responsePeriode =
-  await http.post(
-      '${url}/GetDataPeriode');
-  if (responsePeriode.statusCode == 200) {
-    periodelist = (json.decode(responsePeriode.body)['Table'] as List)
-        .map((data) => new PeriodeModel.fromJson(data))
-        .toList();
-  }
+LineChartData chartData() {
+  return LineChartData(
+    lineTouchData: LineTouchData(
+      touchTooltipData: LineTouchTooltipData(
+        tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+      ),
+      touchCallback: (LineTouchResponse touchResponse) {
+        print(touchResponse);
+      },
+      handleBuiltInTouches: true,
+    ),
+    gridData: const FlGridData(
+      show: false,
+    ),
+    titlesData: FlTitlesData(
+      bottomTitles: SideTitles(
+        showTitles: true,
+        reservedSize: 22,
+        textStyle: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
+        margin: 10,
+        getTitles: (value) {
+          switch (value.toInt()) {
+            case 2:
+              return 'SEPT';
+            case 7:
+              return 'OCT';
+            case 12:
+              return 'DEC';
+          }
+          return '';
+        },
+      ),
+      leftTitles: SideTitles(
+        showTitles: true,
+        textStyle: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+        getTitles: (value) {
+          switch (value.toInt()) {
+            case 1:
+              return '1m';
+            case 2:
+              return '2m';
+            case 3:
+              return '3m';
+            case 4:
+              return '5m';
+          }
+          return '';
+        },
+        margin: 8,
+        reservedSize: 30,
+      ),
+    ),
+    borderData: FlBorderData(
+      show: true,
+      border: Border(
+        bottom: BorderSide(
+          color: Colors.white,
+          width: 3,
+        ),
+        left: BorderSide(
+          color: Colors.transparent,
+        ),
+        right: BorderSide(
+          color: Colors.transparent,
+        ),
+        top: BorderSide(
+          color: Colors.transparent,
+        ),
+      ),
+    ),
+    minX: 0,
+    maxX: 14,
+    maxY: 4,
+    minY: 0,
+    lineBarsData: linesBarData(),
+  );
 }
 
-/*fetchDataTotal(String nik, String periode) async {
-  Map data = {
-    'lokasi': '',
-    'tahun': '',
-    'minggu': '',
-    'nik': nik,
-    'periode': periode
-  };
-
-  var response =
-  await http.post(
-      '${url}/GetWidgetDashboardNewOmsetAreaTotal?',
-      body: data);
-  if (response.statusCode == 200) {
-    list = (json.decode(response.body)['Table'] as List)
-        .map((data) => new OmsetTotalModel.fromJson(data))
-        .toList();
-    target = list[0].target_omset;
-    realisasi = list[0].net_exc_ppn;
-    persentase = list[0].persentase;
-    target_hari = list[0].target_omset_hari;
-    realisasi_hari = list[0].net_exc_ppn_hari;
-    persentase_hari = list[0].persentase_hari;
-  }
+List<LineChartBarData> linesBarData() {
+  LineChartBarData lineChart1 = const LineChartBarData(
+    spots: [
+      FlSpot(1, 1),
+      FlSpot(3, 1.5),
+      FlSpot(5, 1.4),
+      FlSpot(7, 3.4),
+      FlSpot(10, 2),
+      FlSpot(12, 2.2),
+      FlSpot(13, 1.8),
+    ],
+    isCurved: true,
+    colors: [
+      Color(0xff4af699),
+    ],
+    barWidth: 8,
+    isStrokeCapRound: true,
+    dotData: FlDotData(
+      show: false,
+    ),
+    belowBarData: BarAreaData(
+      show: false,
+    ),
+  );
+  final LineChartBarData lineChart2 = LineChartBarData(
+    spots: [
+      FlSpot(1, 1),
+      FlSpot(3, 2.8),
+      FlSpot(7, 1.2),
+      FlSpot(10, 2.8),
+      FlSpot(12, 2.6),
+      FlSpot(13, 3.9),
+    ],
+    isCurved: true,
+    colors: [
+      Color(0xffaa4cfc),
+    ],
+    barWidth: 8,
+    isStrokeCapRound: true,
+    dotData: FlDotData(
+      show: false,
+    ),
+    belowBarData: BarAreaData(show: false, colors: [
+      Color(0x00aa4cfc),
+    ]),
+  );
+  return [
+    lineChart1,
+    lineChart2,
+  ];
 }
 
-fetchDataSO(String nik, String periode) async {
-  Map data = {
-    'lokasi': '',
-    'nik': nik,
-    'periode': periode
-  };
+Map<DateTime, double> createLine2() {
+  Map<DateTime, double> data = {};
 
-  var response =
-  await http.post(
-      '${url}/GetWidgetOrder?',
-      body: data);
-  if (response.statusCode == 200) {
-    listSO = (json.decode(response.body)['Table'] as List)
-        .map((data) => new OmsetSOModel.fromJson(data))
-        .toList();
-    so = listSO[0].so;
-    sj = listSO[0].sj;
-    fk = listSO[0].fk;
-    persentase_kirim = listSO[0].persentase_kirim;
-    persentase_faktur = listSO[0].persentase_faktur;
-  }
+  for ( var i in listBrand )
+    data[DateTime.now().subtract(Duration(minutes: i.berat.toInt()))] =
+        i.jumlah;
+
+  return data;
 }
 
-fetchToko(String nik, String periode) async {
-  Map data = {
-    'lokasi': '',
-    'periode': periode,
-    'nik': nik,
-    'nikSales' : ''
-  };
-
-  var response =
-  await http.post(
-      '${url}/GetDataPersentaseToko?',
-      body: data);
-  if (response.statusCode == 200) {
-    orderSOlist = (json.decode(response.body)['Table'] as List)
-        .map((data) => new TokoModel.fromJson(data))
-        .toList();
-    totalToko = orderSOlist[0].total;
-    totalOrderSO = orderSOlist[0].total_order_so;
-    persentaseToko = orderSOlist[0].persentase;
-  }
+Map<DateTime, double> createLine2_2() {
+  Map<DateTime, double> data = {};
+  data[DateTime.now().subtract(Duration(days: 7))] = 30.0;
+  data[DateTime.now().subtract(Duration(days: 6))] = 48.0;
+  data[DateTime.now().subtract(Duration(days: 5))] = 67.0;
+  data[DateTime.now().subtract(Duration(days: 4))] = 99.0;
+  data[DateTime.now().subtract(Duration(days: 3))] = 23.0;
+  data[DateTime.now().subtract(Duration(days: 2))] = 47.0;
+  data[DateTime.now().subtract(Duration(days: 1))] = 10.0;
+  return data;
 }
-
-fetchBrand(String nik, String periode) async {
-  Map data = {
-    'lokasi': '',
-    'periode': periode,
-    'nik': nik
-  };
-
-  var response =
-  await http.post(
-      '${url}/GetDataBrandPareto?',
-      body: data);
-  if (response.statusCode == 200) {
-    brandlist = (json.decode(response.body)['Table'] as List)
-        .map((data) => new BrandModel.fromJson(data))
-        .toList();
-  }
-}
-
-fetchDataPeriode() async {
-  var response =
-  await http.post(
-      '${url}/GetDataPeriode');
-  if (response.statusCode == 200) {
-    periodelist = (json.decode(response.body)['Table'] as List)
-        .map((data) => new PeriodeModel.fromJson(data))
-        .toList();
-  }
-}*/
 
 // OMSET AREA //
 

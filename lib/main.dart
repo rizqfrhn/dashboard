@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'UI/dashboard.dart';
 import 'drawer.dart';
-import 'package:dashboard/routes.dart';
+import 'package:mobilesfa/routes.dart';
 
 void main() {
   Color darkBlue = Color(0xff071d40);

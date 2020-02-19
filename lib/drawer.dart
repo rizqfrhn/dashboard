@@ -1,12 +1,13 @@
 /*import 'package:dashboard/Login/Login.dart';*/
 //import 'package:dashboard/Login/loginauth.dart';
 import 'Login/signin.dart';
-import 'package:dashboard/Omset/omset.dart';
+import 'package:mobilesfa/Omset/omset.dart';
 import 'UI/json.dart';
 import 'UI/setting.dart';
 import 'UI/chart.dart';
 import 'UI/table.dart';
 import 'UI/dashboard.dart';
+import 'UI/dashboardscm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,6 +27,7 @@ class MyDrawer extends StatefulWidget {
 
   final drawerItem = [
     new DrawerItem("Omset", Icons.show_chart),
+    new DrawerItem("Dashboard SCM", Icons.dashboard),
     /*new DrawerItem("Chart", Icons.insert_chart),
     new DrawerItem("Dashboard", Icons.dashboard),
     new DrawerItem("Json", Icons.desktop_windows),
@@ -46,9 +48,9 @@ class _MyDrawer extends State<MyDrawer> {
     switch (pos) {
       case 0:
         return Omset(nik: widget.nik);
-      /*case 1:
-        return Chart();
-      case 2:
+      case 1:
+        return DashboardSCM();
+      /*case 2:
         return Dashboard();
       case 3:
         return MyJson();

@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 import '../main.dart';
 import '../drawer.dart';
 import 'loginmodel.dart';
@@ -98,11 +96,9 @@ class _LoginPageState extends State<SignIn> {
                       image: AssetImage('images/background6.png'),
                     )
                 ),
-                child: Wrap(
-                  /*crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,*/
-                  runAlignment: WrapAlignment.end,
-                  alignment: WrapAlignment.spaceBetween,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Container(
                     height: 35,

@@ -3,11 +3,14 @@ import 'omsetarea.dart';
 import 'omsetcontroller.dart';
 import '../services.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:fl_chart/fl_chart.dart' as mainchart;
+import 'package:fl_animated_linechart/fl_animated_linechart.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:intl/intl.dart';
@@ -39,6 +42,7 @@ class _Omset extends State<Omset> {
   AnimationController _animationController;
   OmsetDataSource _omsetDataSource = OmsetDataSource([], null, null, null);
   bool loading = false;
+  bool firstload;
   var refreshKey = GlobalKey<RefreshIndicatorState>();
   PeriodeModel periodeSelection;
   String periode = 'O${year}${month}';
@@ -63,10 +67,16 @@ class _Omset extends State<Omset> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
     setState(() {
       loading = true;
       refreshList();
+      new Timer.periodic(Duration(seconds: 20),  (Timer firstTime) =>
+          setState((){
+              refreshList();
+              firstTime.cancel();
+          })
+      );
+      new Timer.periodic(Duration(seconds: 300),  (Timer t) => setState((){refreshList();}));
       periodeSelection = null;
     });
 
@@ -124,8 +134,8 @@ class _Omset extends State<Omset> {
             padding: const EdgeInsets.all(20.0),
             children: <Widget>[
               new Container(
-                child: new Row( 
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
@@ -133,10 +143,10 @@ class _Omset extends State<Omset> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          DetailOmset('Omset', 'Target', 'Real', target, realisasi, persentase),
-                          DetailOmset('Omset Hari', 'Target', 'Real', targetHari, realisasiHari, persentaseHari),
-                          DetailOmset('Tagihan', 'Target', 'Real', targetTagihan, totalBayar, persentaseTagihan),
-                          DetailOmset('Tagihan Hari', 'Target', 'Real', targetTagihanHari, totalBayarHari, persentaseTagihanHari),
+                          DetailOmset('Omset', 'Real', 'Target', realisasi, target, persentase),
+                          DetailOmset('Omset Hari', 'Real', 'Target', realisasiHari, targetHari, persentaseHari),
+                          DetailOmset('Tagihan', 'Real', 'Target', totalBayar, targetTagihan, persentaseTagihan),
+                          DetailOmset('Tagihan Hari', 'Real', 'Target', totalBayarHari, targetTagihanHari, persentaseTagihanHari),
                           /*MtDSection(),*/
                         ]
                     ),
@@ -144,15 +154,23 @@ class _Omset extends State<Omset> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          DetailOmset('SO FK', 'SO', 'FK', so, fk, persentase_faktur),
-                          DetailOmset('SO SJ', 'SO', 'SJ', so, sj, persentase_kirim),
+                          DetailOmset('SO FK', 'FK', 'SO', fk, so, persentase_faktur),
+                          DetailOmset('SO SJ', 'SJ', 'SO', sj, so, persentase_kirim),
                           OrderSOToko(),
+                          liquidChart(),
                         ]
                     ),
                   ],
                 ),
               ),
-              liquidChart(),
+              lineChart(),
+              SizedBox(
+                height: 15,
+              ),
+              lineChart_(),
+              SizedBox(
+                height: 15,
+              ),
               dataOmset(),
               SizedBox(
                 height: 15.0,
@@ -173,7 +191,7 @@ class _Omset extends State<Omset> {
   Widget makeRadioTiles() {
     List<Widget> list = new List<Widget>();
 
-    for (PeriodeModel listperiode in periodelist) {
+    for (PeriodeModel listperiode in listPeriode) {
       list.add(new RadioListTile(
         value: listperiode.kode_periode,
         groupValue: periode,
@@ -185,8 +203,13 @@ class _Omset extends State<Omset> {
               ('${listperiode.TAHUN}-${listperiode.BULAN}-01'));
             yearFormat = new DateFormat("yyyy").format(DateTime.parse
               ('${listperiode.TAHUN}-${listperiode.BULAN}-01'));
-            _fetchData(periode);
-            fetchData(nik, periode);
+            refreshList();
+            new Timer.periodic(Duration(seconds: 5),  (Timer rfs) =>
+                setState((){
+                  refreshList();
+                  rfs.cancel();
+                })
+            );
             Navigator.of(context).pop();
           });
         },
@@ -269,7 +292,7 @@ class _Omset extends State<Omset> {
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.only(bottom: 10.0),
-      width: MediaQuery.of(context).size.width * 0.42,
+      width: MediaQuery.of(context).size.width * 0.44,
       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
       decoration: new BoxDecoration(
         color: Colors.lightBlue,
@@ -428,13 +451,18 @@ class _Omset extends State<Omset> {
   }
 
   Container liquidChart() {
+    Orientation orientation = MediaQuery.of(context).orientation;
     return Container(
-      /*margin: EdgeInsets.only(top: 10.0, bottom: 10.0),*/
-      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+      margin: EdgeInsets.only(/*top: 10.0, */bottom: 10.0),
+      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
       child: Center(
         child: SizedBox(
-          width: MediaQuery.of(context).size.width / 3.0,
-          height: MediaQuery.of(context).size.width / 3.0,
+          width: orientation == Orientation.portrait
+              ? MediaQuery.of(context).size.width * 0.28
+              :  MediaQuery.of(context).size.height * 0.3,
+          height: orientation == Orientation.portrait
+              ? MediaQuery.of(context).size.width * 0.28
+              :  MediaQuery.of(context).size.height * 0.3,
           child: LiquidCircularProgressIndicator(
             value: persentase / 100 <= 0.0 ? 0.0 :
             persentase / 100 >= 1.0 ? 1.0 :
@@ -461,11 +489,161 @@ class _Omset extends State<Omset> {
     );
   }
 
+  Widget lineChart() {
+    Orientation orientation = MediaQuery.of(context).orientation;
+    return AspectRatio(
+      aspectRatio: orientation == Orientation.portrait ? 1.5 : 2.5,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
+          gradient: LinearGradient(
+            colors: [Colors.blue, Colors.lightBlueAccent],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+          ),
+        ),
+        child: Stack(
+          children: <Widget>[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  '${monthFormat} ${yearFormat}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                Text(
+                  'Monthly Sales',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(
+                  height: 35,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 16.0, left: 6.0),
+                    child: mainchart.LineChart(
+                      chartData(),
+                      swapAnimationDuration: Duration(milliseconds: 250),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget lineChart_() {
+    Orientation orientation = MediaQuery.of(context).orientation;
+    return AspectRatio(
+      aspectRatio: orientation == Orientation.portrait ? 1.25 : 2.5,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.white],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+          ),
+          boxShadow: <BoxShadow>[
+            new BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10.0,
+              offset: new Offset(0.0, 10.0),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: <Widget>[
+            Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    '${monthFormat} ${yearFormat}',
+                    style: TextStyle(
+                      color: darkBlue,
+                      fontSize: 18,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    'Monthly Sales',
+                    style: TextStyle(
+                        color: darkBlue,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 15.0, bottom: 0.0),
+                        child: AnimatedLineChart(
+                          LineChart.fromDateTimeMaps(
+                              [createLine2(), createLine2_2()], [Colors.greenAccent, Colors.lightBlueAccent],['', '']),
+                          key: UniqueKey(),
+                        ), //Unique key to force animations
+                      )
+                  ),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    runAlignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.stop, color: Colors.greenAccent),
+                      Text(' : SO'),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Icon(Icons.stop, color: Colors.lightBlueAccent),
+                      Text(' : SJ'),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                ]
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Container OrderSOToko() {
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.only(bottom: 10.0),
-      width: MediaQuery.of(context).size.width * 0.42,
+      width: MediaQuery.of(context).size.width * 0.44,
       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
       decoration: new BoxDecoration(
         color: Colors.lightBlue,
@@ -584,132 +762,132 @@ class _Omset extends State<Omset> {
 
   Widget avgData() {
     return new Column(
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            child: Text("Ratio",
-              style: Theme.of(context)
-                  .textTheme
-                  .title
-                  .apply(color: darkBlue, fontWeightDelta: 2),
+      children: <Widget>[
+        Container(
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          child: Text("Ratio",
+            style: Theme.of(context)
+                .textTheme
+                .title
+                .apply(color: darkBlue, fontWeightDelta: 2),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          child: Divider(
+            height: 31,
+            color: darkBlue,
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(bottom: 10.0),
+          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+          width: MediaQuery.of(context).size.width * 0.95,
+          decoration: new BoxDecoration(
+            color: Colors.lightBlue,
+            shape: BoxShape.rectangle,
+            borderRadius: new BorderRadius.only(
+              topLeft: Radius.circular(5),
+              topRight: Radius.circular(5),
+              bottomLeft: Radius.circular(5),
+              bottomRight: Radius.circular(5),),
+            boxShadow: <BoxShadow>[
+              new BoxShadow(
+                color: Colors.black12,
+                blurRadius: 10.0,
+                offset: new Offset(0.0, 10.0),
               ),
+            ],
           ),
-          Container(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            child: Divider(
-              height: 31,
-              color: darkBlue,
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 10.0),
-            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-            width: MediaQuery.of(context).size.width * 0.95,
-            decoration: new BoxDecoration(
-              color: Colors.lightBlue,
-              shape: BoxShape.rectangle,
-              borderRadius: new BorderRadius.only(
-                topLeft: Radius.circular(5),
-                topRight: Radius.circular(5),
-                bottomLeft: Radius.circular(5),
-                bottomRight: Radius.circular(5),),
-              boxShadow: <BoxShadow>[
-                new BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 10.0,
-                  offset: new Offset(0.0, 10.0),
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Wrap(
+              alignment: WrapAlignment.spaceAround,
+              spacing: 5.0,
+              runSpacing: 5.0,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text('',
+                        style: TextStyle(color: Colors.white)),
+                    SizedBox(height: 10.0),
+                    Text('Target',
+                        style: TextStyle(color: Colors.white)),
+                    Text('Rata-rata Call',
+                        style: TextStyle(color: Colors.white)),
+                    Text('Rata-rata EC',
+                        style: TextStyle(color: Colors.white)),
+                    Text('Rata-rata Invoice',
+                        style: TextStyle(color: Colors.white)),
+                    Text('Jumlah Sales',
+                        style: TextStyle(color: Colors.white)),
+                    Text('Estimasi Tercapai',
+                        style: TextStyle(color: Colors.white)),
+                  ],
+                ),
+                Column(
+                  children: <Widget>[
+                    Text('',
+                        style: TextStyle(color: Colors.white)),
+                    SizedBox(height: 10.0),
+                    Text(':',
+                        style: TextStyle(color: Colors.white)),
+                    Text(':',
+                        style: TextStyle(color: Colors.white)),
+                    Text(':',
+                        style: TextStyle(color: Colors.white)),
+                    Text(':',
+                        style: TextStyle(color: Colors.white)),
+                    Text(':',
+                        style: TextStyle(color: Colors.white)),
+                    Text(':',
+                        style: TextStyle(color: Colors.white)),
+                  ],
+                ),
+                Column(
+                  children: <Widget>[
+                    Text('Avg (3 Months)', style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                    SizedBox(height: 10.0),
+                    Text('${FlutterMoneyFormatter(amount: targetOmsetLast).compact}',
+                        style: TextStyle(color: Colors.white)),
+                    Text('${rataCallLast.toStringAsFixed(0)}',
+                        style: TextStyle(color: Colors.white)),
+                    Text('${rataECLast.toStringAsFixed(0)}',
+                        style: TextStyle(color: Colors.white)),
+                    Text('${FlutterMoneyFormatter(amount: rataFkLast).compact}',
+                        style: TextStyle(color: Colors.white)),
+                    Text('${jumlahSalesLast.toStringAsFixed(0)}',
+                        style: TextStyle(color: Colors.white)),
+                    Text('${estimasiPersentaseLast.toStringAsFixed(2)} %',
+                        style: TextStyle(color: Colors.white)),
+                  ],
+                ),
+                Column(
+                  children: <Widget>[
+                    Text('MTD', style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                    SizedBox(height: 10.0),
+                    Text('${FlutterMoneyFormatter(amount: targetOmset).compact}',
+                        style: TextStyle(color: Colors.white)),
+                    Text('${rataCall.toStringAsFixed(0)}',
+                        style: TextStyle(color: Colors.white)),
+                    Text('${rataEC.toStringAsFixed(0)}',
+                        style: TextStyle(color: Colors.white)),
+                    Text('${FlutterMoneyFormatter(amount: rataFk).compact}',
+                        style: TextStyle(color: Colors.white)),
+                    Text('${jumlahSales.toStringAsFixed(0)}',
+                        style: TextStyle(color: Colors.white)),
+                    Text('${estimasiPersentase.toStringAsFixed(2)} %',
+                        style: TextStyle(color: Colors.white)),
+                  ],
                 ),
               ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Wrap(
-                alignment: WrapAlignment.spaceAround,
-                spacing: 5.0,
-                runSpacing: 5.0,
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text('',
-                          style: TextStyle(color: Colors.white)),
-                      SizedBox(height: 10.0),
-                      Text('Target',
-                          style: TextStyle(color: Colors.white)),
-                      Text('Rata-rata Call',
-                          style: TextStyle(color: Colors.white)),
-                      Text('Rata-rata EC',
-                          style: TextStyle(color: Colors.white)),
-                      Text('Rata-rata Invoice',
-                          style: TextStyle(color: Colors.white)),
-                      Text('Jumlah Sales',
-                          style: TextStyle(color: Colors.white)),
-                      Text('Estimasi Tercapai',
-                          style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                  Column(
-                    children: <Widget>[
-                      Text('',
-                          style: TextStyle(color: Colors.white)),
-                      SizedBox(height: 10.0),
-                      Text(':',
-                          style: TextStyle(color: Colors.white)),
-                      Text(':',
-                          style: TextStyle(color: Colors.white)),
-                      Text(':',
-                          style: TextStyle(color: Colors.white)),
-                      Text(':',
-                          style: TextStyle(color: Colors.white)),
-                      Text(':',
-                          style: TextStyle(color: Colors.white)),
-                      Text(':',
-                          style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                  Column(
-                    children: <Widget>[
-                      Text('Avg (3 Months)', style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-                      SizedBox(height: 10.0),
-                      Text('${0}',
-                          style: TextStyle(color: Colors.white)),
-                      Text('${0}',
-                          style: TextStyle(color: Colors.white)),
-                      Text('${0}',
-                          style: TextStyle(color: Colors.white)),
-                      Text('${0}',
-                          style: TextStyle(color: Colors.white)),
-                      Text('${654} M',
-                          style: TextStyle(color: Colors.white)),
-                      Text('${0}',
-                          style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                  Column(
-                    children: <Widget>[
-                      Text('MTD', style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-                      SizedBox(height: 10.0),
-                      Text('${0}',
-                          style: TextStyle(color: Colors.white)),
-                      Text('${0}',
-                          style: TextStyle(color: Colors.white)),
-                      Text('${0}',
-                          style: TextStyle(color: Colors.white)),
-                      Text('${0}',
-                          style: TextStyle(color: Colors.white)),
-                      Text('${654} M',
-                          style: TextStyle(color: Colors.white)),
-                      Text('${0}',
-                          style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
           ),
-        ],
+        ),
+      ],
     );
   }
 
@@ -757,7 +935,7 @@ class _Omset extends State<Omset> {
             ),
             child: Column(
               children: [
-                for ( var i in brandlist )
+                for ( var i in listBrand )
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child:  Wrap(
@@ -826,7 +1004,7 @@ class _Omset extends State<Omset> {
                       ],
                     ),*/
                   ),
-                ],
+              ],
             ),
           ),
         ]

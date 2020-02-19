@@ -1,4 +1,4 @@
-import 'package:dashboard/Model/chart.dart';
+import 'package:mobilesfa/Model/chart.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';

@@ -42,8 +42,6 @@ class OmsetTotalModel {
   final double net_exc_ppn_hari;
   final double persentase_hari;
 
-  bool selected = false;
-
   OmsetTotalModel({ this.target_omset
     , this.target_volume
     , this.net_exc_ppn
@@ -75,8 +73,6 @@ class OmsetSOModel {
   final double persentase_kirim;
   final double persentase_faktur;
 
-  bool selected = false;
-
   OmsetSOModel({ this.kode_periode
     , this.so
     , this.sj
@@ -102,8 +98,6 @@ class PeriodeModel {
   final String BULAN;
   final String KODE_PERIODE1;
 
-  bool selected = false;
-
   PeriodeModel({ this.kode_periode
     , this.TAHUN
     , this.BULAN
@@ -123,8 +117,6 @@ class TokoModel {
   final double total;
   final double total_order_so;
   final double persentase;
-
-  bool selected = false;
 
   TokoModel({ this.total
     , this.total_order_so
@@ -151,8 +143,6 @@ class BrandModel {
   final double omset_last_year;
   final double total_toko_mtd;
   final double total_toko_last_year;
-
-  bool selected = false;
 
   BrandModel({ this.kode_jenis_merk
     , this.jumlah_toko
@@ -192,8 +182,6 @@ class OmsetTagihModel {
   final double total_bayar_hari;
   final double persentase_hari;
 
-  bool selected = false;
-
   OmsetTagihModel({ this.kode
     , this.target_tagih
     , this.total_bayar
@@ -211,6 +199,54 @@ class OmsetTagihModel {
       target_hari: json['target_hari'] == null ? 0 : json['target_hari'].toDouble(),
       total_bayar_hari: json['total_bayar_hari'] == null ? 0 : json['total_bayar_hari'].toDouble(),
       persentase_hari: json['persentase_hari'] == null ? 0 : json['persentase_hari'].toDouble(),
+    );
+  }
+}
+
+class OmsetCallECModel {
+  final String kode_periode;
+  final double target_omset_last;
+  final double rata_call_last;
+  final double rata_ec_last;
+  final double rata_fk_last;
+  final double jumlah_sales_last;
+  final double estimasi_persentase_last;
+  final double target_omset;
+  final double rata_call;
+  final double rata_ec;
+  final double rata_fk;
+  final double jumlah_sales;
+  final double estimasi_persentase;
+
+  OmsetCallECModel({ this.kode_periode
+    , this.target_omset_last
+    , this.rata_call_last
+    , this.rata_ec_last
+    , this.rata_fk_last
+    , this.jumlah_sales_last
+    , this.estimasi_persentase_last
+    , this.target_omset
+    , this.rata_call
+    , this.rata_ec
+    , this.rata_fk
+    , this.jumlah_sales
+    , this.estimasi_persentase});
+
+  factory OmsetCallECModel.fromJson(Map<String, dynamic> json) {
+    return new OmsetCallECModel(
+      kode_periode: json['kode_periode'],
+      target_omset_last: json['target_omset_last'] == null ? 0 : json['target_omset_last'].toDouble(),
+      rata_call_last: json['rata_call_last'] == null ? 0 : json['rata_call_last'].toDouble(),
+      rata_ec_last: json['rata_ec_last'] == null ? 0 : json['rata_ec_last'].toDouble(),
+      rata_fk_last: json['rata_fk_last'] == null ? 0 : json['rata_fk_last'].toDouble(),
+      jumlah_sales_last: json['jumlah_sales_last'] == null ? 0 : json['jumlah_sales_last'].toDouble(),
+      estimasi_persentase_last: json['estimasi_persentase_last'] == null ? 0 : json['estimasi_persentase_last'].toDouble(),
+      target_omset: json['target_omset'] == null ? 0 : json['target_omset'].toDouble(),
+      rata_call: json['rata_call'] == null ? 0 : json['rata_call'].toDouble(),
+      rata_ec: json['rata_ec'] == null ? 0 : json['rata_ec'].toDouble(),
+      rata_fk: json['rata_fk'] == null ? 0 : json['rata_fk'].toDouble(),
+      jumlah_sales: json['jumlah_sales'] == null ? 0 : json['jumlah_sales'].toDouble(),
+      estimasi_persentase: json['estimasi_persentase'] == null ? 0 : json['estimasi_persentase'].toDouble(),
     );
   }
 }
