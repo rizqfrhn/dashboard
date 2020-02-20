@@ -203,6 +203,8 @@ class _Omset extends State<Omset> {
               ('${listperiode.TAHUN}-${listperiode.BULAN}-01'));
             yearFormat = new DateFormat("yyyy").format(DateTime.parse
               ('${listperiode.TAHUN}-${listperiode.BULAN}-01'));
+            monthChart = int.parse(listperiode.BULAN);
+            yearChart = int.parse(listperiode.TAHUN);
             refreshList();
             new Timer.periodic(Duration(seconds: 5),  (Timer rfs) =>
                 setState((){
@@ -609,7 +611,9 @@ class _Omset extends State<Omset> {
                         padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 15.0, bottom: 0.0),
                         child: AnimatedLineChart(
                           LineChart.fromDateTimeMaps(
-                              [lineSO(), lineSJ()], [Colors.greenAccent, Colors.lightBlueAccent],['', '']),
+                              [lineSO(yearChart, monthChart), lineSJ(yearChart, monthChart), lineTagihan(yearChart, monthChart)],
+                              [Colors.greenAccent, Colors.lightBlueAccent, Colors.redAccent],
+                              ['', '', '']),
                           key: UniqueKey(),
                         ), //Unique key to force animations
                       )
@@ -620,12 +624,17 @@ class _Omset extends State<Omset> {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: <Widget>[
                       Icon(Icons.stop, color: Colors.greenAccent),
-                      Text(' : SO'),
+                      Text(' : SO (Jt)'),
                       const SizedBox(
                         width: 10,
                       ),
                       Icon(Icons.stop, color: Colors.lightBlueAccent),
-                      Text(' : SJ'),
+                      Text(' : SJ (Jt)'),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Icon(Icons.stop, color: Colors.redAccent),
+                      Text(' : Tagihan (Jt)'),
                     ],
                   ),
                   const SizedBox(

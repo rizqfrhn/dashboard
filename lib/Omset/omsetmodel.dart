@@ -251,6 +251,42 @@ class OmsetCallECModel {
   }
 }
 
+class OmsetLineChartModel {
+  final String kode_periode;
+  final int tgl;
+  final double total_so;
+  final double total_qty_bl_jt;
+  final double total_qty_jt;
+  final double total_harga_sj;
+  final double total_harga_sj_last;
+  final double total_harga_sj_now;
+  final double total_bayar;
+
+  OmsetLineChartModel({ this.kode_periode
+    , this.tgl
+    , this.total_so
+    , this.total_qty_bl_jt
+    , this.total_qty_jt
+    , this.total_harga_sj
+    , this.total_harga_sj_last
+    , this.total_harga_sj_now
+    , this.total_bayar});
+
+  factory OmsetLineChartModel.fromJson(Map<String, dynamic> json) {
+    return new OmsetLineChartModel(
+      kode_periode: json['kode_periode'],
+      tgl: json['tgl'] == null ? 0 : json['tgl'].toInt(),
+      total_so: json['total_so'] == null ? 0 : json['total_so'].toDouble(),
+      total_qty_bl_jt: json['total_qty_bl_jt'] == null ? 0 : json['total_qty_bl_jt'].toDouble(),
+      total_qty_jt: json['total_qty_jt'] == null ? 0 : json['total_qty_jt'].toDouble(),
+      total_harga_sj: json['total_harga_sj'] == null ? 0 : json['total_harga_sj'].toDouble(),
+      total_harga_sj_last: json['total_harga_sj_last'] == null ? 0 : json['total_harga_sj_last'].toDouble(),
+      total_harga_sj_now: json['total_harga_sj_now'] == null ? 0 : json['total_harga_sj_now'].toDouble(),
+      total_bayar: json['total_bayar'] == null ? 0 : json['total_bayar'].toDouble(),
+    );
+  }
+}
+
 // Omset Area
 
 class OmsetAreaModel {

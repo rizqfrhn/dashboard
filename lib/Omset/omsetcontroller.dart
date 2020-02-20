@@ -39,6 +39,7 @@ List<PeriodeModel> listPeriode = [];
 List<BrandModel> listBrand = [];
 List<TokoModel> listToko = [];
 List<OmsetCallECModel> listCallEC = [];
+List<OmsetLineChartModel> listLineChart = [];
 bool loading = false;
 var refreshKey = GlobalKey<RefreshIndicatorState>();
 PeriodeModel periodeSelection;
@@ -52,6 +53,9 @@ double targetOmset = 0, rataCall = 0, rataEC = 0,
     rataFk = 0, jumlahSales = 0, estimasiPersentase = 0;
 double targetOmsetLast = 0, rataCallLast = 0, rataECLast = 0,
     rataFkLast = 0, jumlahSalesLast = 0, estimasiPersentaseLast = 0;
+var now = new DateTime.now();
+int monthChart = now.month;
+int yearChart = now.year;
 
 fetchData(String nik, String periode) async {
 // Detail Omset & Tagihan
@@ -95,7 +99,7 @@ fetchData(String nik, String periode) async {
     persentaseTagihanHari = listTagihan[0].persentase_hari;
   }
 
-// Detail SO, Brand & CallEC
+// Detail SO, Brand , Line Chart & CallEC
   Map dataParam = {
     'lokasi': '',
     'nik': nik,
@@ -147,6 +151,19 @@ fetchData(String nik, String periode) async {
     rataFkLast = listCallEC[0].rata_fk_last;
     jumlahSalesLast = listCallEC[0].jumlah_sales_last;
     estimasiPersentaseLast = listCallEC[0].estimasi_persentase_last;
+  }
+
+  var responselineChart =
+  await http.post(
+      '${url}/GetWidgetHarianChart?',
+      body: dataParam);
+  if (responselineChart.statusCode == 200) {
+    listLineChart = (json.decode(responselineChart.body)['Table'] as List)
+        .map((data) => new OmsetLineChartModel.fromJson(data))
+        .toList();
+    lineSO(yearChart, monthChart);
+    lineSJ(yearChart, monthChart);
+    lineTagihan(yearChart, monthChart);
   }
 
 // Detail Toko
@@ -540,37 +557,42 @@ List<LineChartBarData> linesBarData() {
   ];
 }
 
-Map<DateTime, double> lineSO() {
+Map<DateTime, double> lineSO(int year, int month) {
   Map<DateTime, double> data = {};
 
-  for ( var i in listBrand )
-    data[DateTime.now().subtract(Duration(minutes: i.berat.toInt()))] =
-        i.jumlah;
+  if (listLineChart.length != 0) {
+    for (var i in listLineChart)
+      data[DateTime(year, month, i.tgl)] = i.total_so;
+  } else {
+    data[DateTime.now()] = 0;
+  }
 
   return data;
 }
 
-Map<DateTime, double> lineSJ() {
+Map<DateTime, double> lineSJ(int year, int month) {
   Map<DateTime, double> data = {};
-  data[DateTime.now().subtract(Duration(days: 7))] = 30.0;
-  data[DateTime.now().subtract(Duration(days: 6))] = 48.0;
-  data[DateTime.now().subtract(Duration(days: 5))] = 67.0;
-  data[DateTime.now().subtract(Duration(days: 4))] = 99.0;
-  data[DateTime.now().subtract(Duration(days: 3))] = 23.0;
-  data[DateTime.now().subtract(Duration(days: 2))] = 47.0;
-  data[DateTime.now().subtract(Duration(days: 1))] = 10.0;
+
+  if (listLineChart.length != 0) {
+    for (var i in listLineChart)
+      data[DateTime(year, month, i.tgl)] = i.total_harga_sj;
+  } else {
+    data[DateTime.now()] = 0;
+  }
+
   return data;
 }
 
-Map<DateTime, double> lineTagihan() {
+Map<DateTime, double> lineTagihan(int year, int month) {
   Map<DateTime, double> data = {};
-  data[DateTime.now().subtract(Duration(days: 7))] = 30.0;
-  data[DateTime.now().subtract(Duration(days: 6))] = 48.0;
-  data[DateTime.now().subtract(Duration(days: 5))] = 67.0;
-  data[DateTime.now().subtract(Duration(days: 4))] = 99.0;
-  data[DateTime.now().subtract(Duration(days: 3))] = 23.0;
-  data[DateTime.now().subtract(Duration(days: 2))] = 47.0;
-  data[DateTime.now().subtract(Duration(days: 1))] = 10.0;
+
+  if (listLineChart.length != 0) {
+    for (var i in listLineChart)
+      data[DateTime(year, month, i.tgl)] = i.total_bayar;
+  } else {
+    data[DateTime.now()] = 0;
+  }
+
   return data;
 }
 
