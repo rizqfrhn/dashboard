@@ -323,7 +323,7 @@ class _Omset extends State<Omset> {
               height: 7.5,
             ),
             Wrap(
-              spacing: 5.0,
+              spacing: 10.0,
               runSpacing: 5.0,
               children: <Widget>[
                 Column(
@@ -352,32 +352,30 @@ class _Omset extends State<Omset> {
                         style: TextStyle(color: Colors.white)),
                   ],
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text('%',
-                        style: TextStyle(color: Colors.white)),
-                    SizedBox(
-                      height: 5.0,
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.15,
-                      child: new LinearPercentIndicator(
-                        width: MediaQuery.of(context).size.width * 0.15,
-                        alignment: MainAxisAlignment.center,
-                        animation: true,
-                        lineHeight: 20.0,
-                        animationDuration: 2000,
-                        percent: 1.0,
-                        center: Text('${persentase_.toStringAsFixed(2)}', style: TextStyle(color: Colors.white)),
-                        linearStrokeCap: LinearStrokeCap.roundAll,
-                        progressColor: persentase_ <= 80 ? Colors.red :
-                        persentase_ <= 90 ? Colors.orange :
-                        Colors.green,
-                      ),
-                    ),
-                  ],
+              ],
+            ),
+            SizedBox(
+              height: 5.0,
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  child: new LinearPercentIndicator(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    alignment: MainAxisAlignment.center,
+                    animation: true,
+                    lineHeight: 20.0,
+                    animationDuration: 2000,
+                    percent: 1.0,
+                    center: Text('${persentase_.toStringAsFixed(2)} %', style: TextStyle(color: Colors.white)),
+                    linearStrokeCap: LinearStrokeCap.roundAll,
+                    progressColor: persentase_ <= 80 ? Colors.red :
+                    persentase_ <= 90 ? Colors.orange :
+                    Colors.green,
+                  ),
                 ),
               ],
             ),
@@ -452,10 +450,163 @@ class _Omset extends State<Omset> {
     );
   }
 
+  Container OrderSOToko() {
+    return Container(
+      alignment: Alignment.center,
+      margin: EdgeInsets.only(bottom: 10.0),
+      width: MediaQuery.of(context).size.width * 0.44,
+      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+      decoration: new BoxDecoration(
+        color: Colors.lightBlue,
+        shape: BoxShape.rectangle,
+        borderRadius: new BorderRadius.only(
+          topLeft: Radius.circular(5),
+          topRight: Radius.circular(5),
+          bottomLeft: Radius.circular(5),
+          bottomRight: Radius.circular(30),
+        ),
+        boxShadow: <BoxShadow>[
+          new BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10.0,
+            offset: new Offset(0.0, 10.0),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              Text('Distribusi Toko', style: TextStyle(fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white)),
+              SizedBox(
+                height: 7.5,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text('   Toko   ',
+                          style: TextStyle(color: Colors.white)),
+                      SizedBox(
+                        height: 5.0,
+                      ),
+                      Text('${numformat.format(totalOrderSO)}',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text('',
+                          style: TextStyle(color: Colors.white)),
+                      SizedBox(
+                        height: 5.0,
+                      ),
+                      Text(' / ',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text('Total Toko',
+                          style: TextStyle(color: Colors.white)),
+                      SizedBox(
+                        height: 5.0,
+                      ),
+                      Text('${numformat.format(totalToko)}',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 5.0,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.3,
+                child: new LinearPercentIndicator(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  alignment: MainAxisAlignment.center,
+                  animation: true,
+                  lineHeight: 20.0,
+                  animationDuration: 2000,
+                  percent: 1.0,
+                  center: Text('${persentaseToko.toStringAsFixed(2)} %', style: TextStyle(color: Colors.white)),
+                  linearStrokeCap: LinearStrokeCap.roundAll,
+                  progressColor: persentaseToko <= 80 ? Colors.red :
+                  persentaseToko <= 90 ? Colors.orange :
+                  Colors.green,
+                ),
+              ),
+              SizedBox(
+                height: 7.5,
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                child: new LinearPercentIndicator(
+                  animation: true,
+                  backgroundColor: Colors.white,
+                  lineHeight: 2.0,
+                  animationDuration: 2000,
+                  percent: persentaseToko / 100 <= 0.0 ? 0.0 :
+                  persentaseToko / 100 >= 1.0 ? 1.0 :
+                  persentaseToko / 100,
+                  linearStrokeCap: LinearStrokeCap.roundAll,
+                  progressColor: persentaseToko <= 80 ? Colors.red :
+                  persentaseToko <= 90 ? Colors.orange :
+                  Colors.green,
+                ),
+              ),
+              /*Text('Distribusi Toko', style: TextStyle(fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white)),
+              /*SizedBox(height: 20.0),*/
+              Divider(
+                height: 21,
+                color: Colors.white,
+              ),
+              Text('${numformat.format(totalOrderSO)} / ${numformat.format(totalToko)}', style: TextStyle(color: Colors.white)),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                child: new LinearPercentIndicator(
+                  animation: true,
+                  lineHeight: 20.0,
+                  animationDuration: 2000,
+                  percent: persentaseToko / 100 <= 0.0 ? 0.0 :
+                  persentaseToko / 100 >= 1.0 ? 1.0 :
+                  persentaseToko / 100,
+                  center: Text('${persentaseToko.toStringAsFixed(2)}%', style: TextStyle(color: Colors.white)),
+                  linearStrokeCap: LinearStrokeCap.roundAll,
+                  progressColor: persentaseToko <= 80 ? Colors.red :
+                  persentaseToko <= 90 ? Colors.orange :
+                  Colors.green,
+                  /*progressColor: omset.persentase_bulan <= 40 ? Colors.red :
+                  omset.persentase_bulan <= 60 ? Colors.amberAccent :
+                  omset.persentase_bulan <= 80 ? Colors.lightBlueAccent :
+                  omset.persentase_bulan <= 90 ? Colors.lightGreen :
+                  Colors.green,*/
+                ),
+              ),*/
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Container liquidChart() {
     Orientation orientation = MediaQuery.of(context).orientation;
     return Container(
-      margin: EdgeInsets.only(/*top: 10.0, */bottom: 10.0),
+      margin: EdgeInsets.only(top: 5.0, bottom: 10.0),
       padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
       child: Center(
         child: SizedBox(
@@ -612,7 +763,7 @@ class _Omset extends State<Omset> {
                         child: AnimatedLineChart(
                           LineChart.fromDateTimeMaps(
                               [lineSO(yearChart, monthChart), lineSJ(yearChart, monthChart), lineTagihan(yearChart, monthChart)],
-                              [Colors.greenAccent, Colors.lightBlueAccent, Colors.redAccent],
+                              [Colors.green , Colors.lightBlue, Colors.red],
                               ['', '', '']),
                           key: UniqueKey(),
                         ), //Unique key to force animations
@@ -623,17 +774,17 @@ class _Omset extends State<Omset> {
                     runAlignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: <Widget>[
-                      Icon(Icons.stop, color: Colors.greenAccent),
+                      Icon(Icons.stop, color: Colors.green),
                       Text(' : SO (Jt)'),
                       const SizedBox(
                         width: 10,
                       ),
-                      Icon(Icons.stop, color: Colors.lightBlueAccent),
+                      Icon(Icons.stop, color: Colors.lightBlue),
                       Text(' : SJ (Jt)'),
                       const SizedBox(
                         width: 10,
                       ),
-                      Icon(Icons.stop, color: Colors.redAccent),
+                      Icon(Icons.stop, color: Colors.red),
                       Text(' : Tagihan (Jt)'),
                     ],
                   ),
@@ -643,70 +794,6 @@ class _Omset extends State<Omset> {
                 ]
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Container OrderSOToko() {
-    return Container(
-      alignment: Alignment.center,
-      margin: EdgeInsets.only(bottom: 10.0),
-      width: MediaQuery.of(context).size.width * 0.44,
-      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-      decoration: new BoxDecoration(
-        color: Colors.lightBlue,
-        shape: BoxShape.rectangle,
-        borderRadius: new BorderRadius.only(
-          topLeft: Radius.circular(5),
-          topRight: Radius.circular(5),
-          bottomLeft: Radius.circular(5),
-          bottomRight: Radius.circular(30),
-        ),
-        boxShadow: <BoxShadow>[
-          new BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10.0,
-            offset: new Offset(0.0, 10.0),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Container(
-          child: Column(
-            children: <Widget>[
-              Text('Distribusi Toko', style: TextStyle(fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
-              /*SizedBox(height: 20.0),*/
-              Divider(
-                height: 21,
-                color: Colors.white,
-              ),
-              Text('${numformat.format(totalOrderSO)} / ${numformat.format(totalToko)}', style: TextStyle(color: Colors.white)),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                child: new LinearPercentIndicator(
-                  animation: true,
-                  lineHeight: 20.0,
-                  animationDuration: 2000,
-                  percent: persentaseToko / 100 <= 0.0 ? 0.0 :
-                  persentaseToko / 100 >= 1.0 ? 1.0 :
-                  persentaseToko / 100,
-                  center: Text('${persentaseToko.toStringAsFixed(2)}%', style: TextStyle(color: Colors.white)),
-                  linearStrokeCap: LinearStrokeCap.roundAll,
-                  progressColor: persentaseToko <= 80 ? Colors.red :
-                  persentaseToko <= 90 ? Colors.orange :
-                  Colors.green,
-                  /*progressColor: omset.persentase_bulan <= 40 ? Colors.red :
-            omset.persentase_bulan <= 60 ? Colors.amberAccent :
-            omset.persentase_bulan <= 80 ? Colors.lightBlueAccent :
-            omset.persentase_bulan <= 90 ? Colors.lightGreen :
-            Colors.green,*/
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -738,7 +825,7 @@ class _Omset extends State<Omset> {
                   ascending),
         ),
         DataColumn(
-          label: const Text('Status'),
+          label: const Text('MTD'),
           onSort: (int columnIndex, bool ascending) =>
               _sort<num>(
                       (OmsetModel d) => d.persentase_bulan,
@@ -823,15 +910,15 @@ class _Omset extends State<Omset> {
                     SizedBox(height: 10.0),
                     Text('Target',
                         style: TextStyle(color: Colors.white)),
-                    Text('Rata-rata Call',
+                    Text('Av Call',
                         style: TextStyle(color: Colors.white)),
-                    Text('Rata-rata EC',
+                    Text('Av EC',
                         style: TextStyle(color: Colors.white)),
-                    Text('Rata-rata Invoice',
+                    Text('Av Invoice',
                         style: TextStyle(color: Colors.white)),
-                    Text('Jumlah Sales',
+                    Text('Sales',
                         style: TextStyle(color: Colors.white)),
-                    Text('Estimasi Tercapai',
+                    Text('Estimasi',
                         style: TextStyle(color: Colors.white)),
                   ],
                 ),
@@ -965,9 +1052,9 @@ class _Omset extends State<Omset> {
                           children: <Widget>[
                             Text('Omset',
                                 style: TextStyle(color: Colors.white)),
-                            Text('Sebaran 1 Tahun Lalu',
+                            Text('Dist LY',
                                 style: TextStyle(color: Colors.white)),
-                            Text('Sebaran MTD',
+                            Text('Dist MTD',
                                 style: TextStyle(color: Colors.white)),
                           ],
                         ),
@@ -986,11 +1073,11 @@ class _Omset extends State<Omset> {
                           children: <Widget>[
                             Text('${FlutterMoneyFormatter(amount: i.omset).compact}',
                                 style: TextStyle(color: Colors.white)),
-                            Text('${i.jumlah_toko_last_year.toStringAsFixed(0)} Toko / '
-                                '${i.total_toko_last_year.toStringAsFixed(0)} Toko',
+                            Text('${numformat.format(i.jumlah_toko_last_year)} Tk / '
+                                '${numformat.format(i.total_toko_last_year)} Tk',
                                 style: TextStyle(color: Colors.white)),
-                            Text('${i.jumlah_toko.toStringAsFixed(0)} Toko / '
-                                '${i.total_toko_mtd.toStringAsFixed(0)} Toko',
+                            Text('${numformat.format(i.jumlah_toko)} Tk / '
+                                '${numformat.format(i.total_toko_mtd)} Tk',
                                 style: TextStyle(color: Colors.white)),
                           ],
                         ),
