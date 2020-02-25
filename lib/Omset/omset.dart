@@ -507,7 +507,7 @@ class _Omset extends State<Omset> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text(' / ',
+                      Text('',
                           style: TextStyle(color: Colors.white)),
                       SizedBox(
                         height: 5.0,
