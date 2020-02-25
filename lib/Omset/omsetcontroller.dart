@@ -40,6 +40,9 @@ List<BrandModel> listBrand = [];
 List<TokoModel> listToko = [];
 List<OmsetCallECModel> listCallEC = [];
 List<OmsetLineChartModel> listLineChart = [];
+Map<DateTime, double> lineChartSO = lineSO();
+Map<DateTime, double> lineChartSJ = lineSJ();
+Map<DateTime, double> lineChartTG = lineTagihan();
 bool loading = false;
 var refreshKey = GlobalKey<RefreshIndicatorState>();
 PeriodeModel periodeSelection;
@@ -56,6 +59,75 @@ double targetOmsetLast = 0, rataCallLast = 0, rataECLast = 0,
 var now = new DateTime.now();
 int monthChart = now.month;
 int yearChart = now.year;
+
+fetchDataChart(String nik, String periode) async {
+  Map dataParam = {
+    'lokasi': '',
+    'nik': nik,
+    'periode': periode
+  };
+
+  var responselineChart =
+  await http.post(
+      '${url}/GetWidgetHarianChart?',
+      body: dataParam);
+  if (responselineChart.statusCode == 200) {
+    listLineChart = (json.decode(responselineChart.body)['Table'] as List)
+        .map((data) => new OmsetLineChartModel.fromJson(data))
+        .toList();
+    lineChartSO = lineSO();
+    lineChartSJ = lineSJ();
+    lineChartTG = lineTagihan();
+  }
+}
+
+fetchDataBrand(String nik, String periode) async {
+  Map dataParam = {
+    'lokasi': '',
+    'nik': nik,
+    'periode': periode
+  };
+
+  var responseBrand =
+  await http.post(
+      '${url}/GetDataBrandPareto?',
+      body: dataParam);
+  if (responseBrand.statusCode == 200) {
+    listBrand = (json.decode(responseBrand.body)['Table'] as List)
+        .map((data) => new BrandModel.fromJson(data))
+        .toList();
+  }
+}
+
+fetchDataCallEC(String nik, String periode) async {
+  Map dataParam = {
+    'lokasi': '',
+    'nik': nik,
+    'periode': periode
+  };
+
+  var responseCallEC =
+  await http.post(
+      '${url}/GetWidgetCallEc?',
+      body: dataParam);
+  if (responseCallEC.statusCode == 200) {
+    listCallEC = (json.decode(responseCallEC.body)['Table'] as List)
+        .map((data) => new OmsetCallECModel.fromJson(data))
+        .toList();
+    targetOmset = listCallEC[0].target_omset;
+    rataCall = listCallEC[0].rata_call;
+    rataEC = listCallEC[0].rata_ec;
+    rataFk = listCallEC[0].rata_fk;
+    jumlahSales = listCallEC[0].jumlah_sales;
+    estimasiPersentase = listCallEC[0].estimasi_persentase;
+    targetOmsetLast = listCallEC[0].target_omset_last;
+    rataCallLast = listCallEC[0].rata_call_last;
+    rataECLast = listCallEC[0].rata_ec_last;
+    rataFkLast = listCallEC[0].rata_fk_last;
+    jumlahSalesLast = listCallEC[0].jumlah_sales_last;
+    estimasiPersentaseLast = listCallEC[0].estimasi_persentase_last;
+  }
+}
 
 fetchData(String nik, String periode) async {
 // Detail Omset & Tagihan
@@ -99,7 +171,7 @@ fetchData(String nik, String periode) async {
     persentaseTagihanHari = listTagihan[0].persentase_hari;
   }
 
-// Detail SO, Brand , Line Chart & CallEC
+// Detail SO
   Map dataParam = {
     'lokasi': '',
     'nik': nik,
@@ -119,51 +191,6 @@ fetchData(String nik, String periode) async {
     fk = listSO[0].fk;
     persentase_kirim = listSO[0].persentase_kirim;
     persentase_faktur = listSO[0].persentase_faktur;
-  }
-
-  var responseBrand =
-  await http.post(
-      '${url}/GetDataBrandPareto?',
-      body: dataParam);
-  if (responseBrand.statusCode == 200) {
-    listBrand = (json.decode(responseBrand.body)['Table'] as List)
-        .map((data) => new BrandModel.fromJson(data))
-        .toList();
-  }
-
-  var responseCallEC =
-  await http.post(
-      '${url}/GetWidgetCallEc?',
-      body: dataParam);
-  if (responseCallEC.statusCode == 200) {
-    listCallEC = (json.decode(responseCallEC.body)['Table'] as List)
-        .map((data) => new OmsetCallECModel.fromJson(data))
-        .toList();
-    targetOmset = listCallEC[0].target_omset;
-    rataCall = listCallEC[0].rata_call;
-    rataEC = listCallEC[0].rata_ec;
-    rataFk = listCallEC[0].rata_fk;
-    jumlahSales = listCallEC[0].jumlah_sales;
-    estimasiPersentase = listCallEC[0].estimasi_persentase;
-    targetOmsetLast = listCallEC[0].target_omset_last;
-    rataCallLast = listCallEC[0].rata_call_last;
-    rataECLast = listCallEC[0].rata_ec_last;
-    rataFkLast = listCallEC[0].rata_fk_last;
-    jumlahSalesLast = listCallEC[0].jumlah_sales_last;
-    estimasiPersentaseLast = listCallEC[0].estimasi_persentase_last;
-  }
-
-  var responselineChart =
-  await http.post(
-      '${url}/GetWidgetHarianChart?',
-      body: dataParam);
-  if (responselineChart.statusCode == 200) {
-    listLineChart = (json.decode(responselineChart.body)['Table'] as List)
-        .map((data) => new OmsetLineChartModel.fromJson(data))
-        .toList();
-    lineSO(yearChart, monthChart);
-    lineSJ(yearChart, monthChart);
-    lineTagihan(yearChart, monthChart);
   }
 
 // Detail Toko
@@ -371,6 +398,26 @@ class OmsetDataSource extends DataTableSource {
             animation: true,
             lineHeight: 20.0,
             animationDuration: 2000,
+            percent: omset.persentase_harian / 100 <= 0.0 ? 0.0 :
+            omset.persentase_harian / 100 >= 1.0 ? 1.0 :
+            omset.persentase_harian / 100,
+            center: Text('${omset.persentase_harian.toStringAsFixed(2)}%', style: TextStyle(color: Colors.white)),
+            linearStrokeCap: LinearStrokeCap.roundAll,
+            progressColor: omset.persentase_harian <= 80 ? Colors.red :
+            omset.persentase_harian <= 90 ? Colors.orange :
+            Colors.green,
+          ),
+        ), onTap: () {Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => OmsetArea(nama_regional: omset.nama_regional, nik: nik, periode: periode,)),
+        );}),
+        DataCell(Padding(
+          padding: EdgeInsets.all(0.0),
+          child: new LinearPercentIndicator(
+            width: 75,
+            animation: true,
+            lineHeight: 20.0,
+            animationDuration: 2000,
             percent: omset.persentase_bulan / 100 <= 0.0 ? 0.0 :
             omset.persentase_bulan / 100 >= 1.0 ? 1.0 :
             omset.persentase_bulan / 100,
@@ -557,12 +604,12 @@ List<LineChartBarData> linesBarData() {
   ];
 }
 
-Map<DateTime, double> lineSO(int year, int month) {
+Map<DateTime, double> lineSO() {
   Map<DateTime, double> data = {};
 
   if (listLineChart.length != 0) {
     for (var i in listLineChart)
-      data[DateTime(year, month, i.tgl)] = i.total_so;
+      data[DateTime(i.tahun, i.bulan, i.tgl)] = i.total_so;
   } else {
     data[DateTime.now()] = 0;
   }
@@ -570,12 +617,12 @@ Map<DateTime, double> lineSO(int year, int month) {
   return data;
 }
 
-Map<DateTime, double> lineSJ(int year, int month) {
+Map<DateTime, double> lineSJ() {
   Map<DateTime, double> data = {};
 
   if (listLineChart.length != 0) {
     for (var i in listLineChart)
-      data[DateTime(year, month, i.tgl)] = i.total_harga_sj;
+      data[DateTime(i.tahun, i.bulan, i.tgl)] = i.total_harga_sj;
   } else {
     data[DateTime.now()] = 0;
   }
@@ -583,12 +630,12 @@ Map<DateTime, double> lineSJ(int year, int month) {
   return data;
 }
 
-Map<DateTime, double> lineTagihan(int year, int month) {
+Map<DateTime, double> lineTagihan() {
   Map<DateTime, double> data = {};
 
   if (listLineChart.length != 0) {
     for (var i in listLineChart)
-      data[DateTime(year, month, i.tgl)] = i.total_bayar;
+      data[DateTime(i.tahun, i.bulan, i.tgl)] = i.total_bayar;
   } else {
     data[DateTime.now()] = 0;
   }

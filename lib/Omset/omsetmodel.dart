@@ -7,6 +7,7 @@ class OmsetModel {
   final double target_volume;
   final double net_exc_ppn;
   final double persentase_bulan;
+  final double persentase_harian;
   final double nomor;
 
   bool selected = false;
@@ -17,6 +18,7 @@ class OmsetModel {
     , this.target_volume
     , this.net_exc_ppn
     , this.persentase_bulan
+    , this.persentase_harian
     , this.nomor});
 
   factory OmsetModel.fromJson(Map<String, dynamic> json) {
@@ -27,6 +29,7 @@ class OmsetModel {
       target_volume: json['target_volume'] == null ? 0 : json['target_volume'].toDouble(),
       net_exc_ppn: json['net_exc_ppn'] == null ? 0 : json['net_exc_ppn'].toDouble(),
       persentase_bulan: json['persentase_bulan'] == null ? 0 : json['persentase_bulan'].toDouble(),
+      persentase_harian: json['persentase_harian'] == null ? 0 : json['persentase_harian'].toDouble(),
       nomor: json['nomor'] == null ? 0 : json['nomor'].toDouble(),
     );
   }
@@ -253,6 +256,8 @@ class OmsetCallECModel {
 
 class OmsetLineChartModel {
   final String kode_periode;
+  final int tahun;
+  final int bulan;
   final int tgl;
   final double total_so;
   final double total_qty_bl_jt;
@@ -263,6 +268,8 @@ class OmsetLineChartModel {
   final double total_bayar;
 
   OmsetLineChartModel({ this.kode_periode
+    , this.tahun
+    , this.bulan
     , this.tgl
     , this.total_so
     , this.total_qty_bl_jt
@@ -275,6 +282,8 @@ class OmsetLineChartModel {
   factory OmsetLineChartModel.fromJson(Map<String, dynamic> json) {
     return new OmsetLineChartModel(
       kode_periode: json['kode_periode'],
+      tahun: json['tahun'] == null ? 0 : json['tahun'].toInt(),
+      bulan: json['tgl'] == null ? 0 : json['bulan'].toInt(),
       tgl: json['tgl'] == null ? 0 : json['tgl'].toInt(),
       total_so: json['total_so'] == null ? 0 : json['total_so'].toDouble(),
       total_qty_bl_jt: json['total_qty_bl_jt'] == null ? 0 : json['total_qty_bl_jt'].toDouble(),

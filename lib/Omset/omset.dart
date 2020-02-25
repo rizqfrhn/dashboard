@@ -89,6 +89,9 @@ class _Omset extends State<Omset> {
     setState(() {
       _fetchData(periode);
       fetchData(nik, periode);
+      fetchDataChart(nik, periode);
+      fetchDataBrand(nik, periode);
+      fetchDataCallEC(nik, periode);
       /*fetchDataSO(nik, periode);
       fetchBrand(nik, periode);
       fetchToko(nik, periode);
@@ -144,9 +147,9 @@ class _Omset extends State<Omset> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           DetailOmset('Omset', 'Real', 'Target', realisasi, target, persentase),
-                          DetailOmset('Omset Hari', 'Real', 'Target', realisasiHari, targetHari, persentaseHari),
                           DetailOmset('Tagihan', 'Real', 'Target', totalBayar, targetTagihan, persentaseTagihan),
-                          DetailOmset('Tagihan Hari', 'Real', 'Target', totalBayarHari, targetTagihanHari, persentaseTagihanHari),
+                          DetailOmset('SO SJ', 'SJ', 'SO', sj, so, persentase_kirim),
+                          liquidChart(),
                           /*MtDSection(),*/
                         ]
                     ),
@@ -154,10 +157,10 @@ class _Omset extends State<Omset> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
+                          DetailOmset('Omset Hari', 'Real', 'Target', realisasiHari, targetHari, persentaseHari),
+                          DetailOmset('Tagihan Hari', 'Real', 'Target', totalBayarHari, targetTagihanHari, persentaseTagihanHari),
                           DetailOmset('SO FK', 'FK', 'SO', fk, so, persentase_faktur),
-                          DetailOmset('SO SJ', 'SJ', 'SO', sj, so, persentase_kirim),
                           OrderSOToko(),
-                          liquidChart(),
                         ]
                     ),
                   ],
@@ -483,15 +486,15 @@ class _Omset extends State<Omset> {
               SizedBox(
                 height: 7.5,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                mainAxisSize: MainAxisSize.min,
+              Wrap(
+                spacing: 10.0,
+                runSpacing: 5.0,
                 children: <Widget>[
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text('   Toko   ',
+                      Text('SO',
                           style: TextStyle(color: Colors.white)),
                       SizedBox(
                         height: 5.0,
@@ -504,7 +507,7 @@ class _Omset extends State<Omset> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text('',
+                      Text(' / ',
                           style: TextStyle(color: Colors.white)),
                       SizedBox(
                         height: 5.0,
@@ -517,7 +520,7 @@ class _Omset extends State<Omset> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text('Total Toko',
+                      Text('Toko',
                           style: TextStyle(color: Colors.white)),
                       SizedBox(
                         height: 5.0,
@@ -606,15 +609,15 @@ class _Omset extends State<Omset> {
   Container liquidChart() {
     Orientation orientation = MediaQuery.of(context).orientation;
     return Container(
-      margin: EdgeInsets.only(top: 5.0, bottom: 10.0),
+      margin: EdgeInsets.only(top: 7.5, bottom: 7.5),
       padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
       child: Center(
         child: SizedBox(
           width: orientation == Orientation.portrait
-              ? MediaQuery.of(context).size.width * 0.28
+              ? MediaQuery.of(context).size.width * 0.29
               :  MediaQuery.of(context).size.height * 0.3,
           height: orientation == Orientation.portrait
-              ? MediaQuery.of(context).size.width * 0.28
+              ? MediaQuery.of(context).size.width * 0.29
               :  MediaQuery.of(context).size.height * 0.3,
           child: LiquidCircularProgressIndicator(
             value: persentase / 100 <= 0.0 ? 0.0 :
@@ -675,7 +678,7 @@ class _Omset extends State<Omset> {
                   height: 5,
                 ),
                 Text(
-                  'Monthly Sales',
+                  'Daily Sales',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 32,
@@ -711,6 +714,7 @@ class _Omset extends State<Omset> {
     return AspectRatio(
       aspectRatio: orientation == Orientation.portrait ? 1.25 : 2.5,
       child: Container(
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(5)),
           gradient: LinearGradient(
@@ -726,7 +730,7 @@ class _Omset extends State<Omset> {
             ),
           ],
         ),
-        child: Stack(
+        child: listLineChart.length > 0 ? Stack(
           children: <Widget>[
             Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -746,7 +750,7 @@ class _Omset extends State<Omset> {
                     height: 5,
                   ),
                   Text(
-                    'Monthly Sales',
+                    'Daily Sales',
                     style: TextStyle(
                         color: darkBlue,
                         fontSize: 32,
@@ -762,8 +766,8 @@ class _Omset extends State<Omset> {
                         padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 15.0, bottom: 0.0),
                         child: AnimatedLineChart(
                           LineChart.fromDateTimeMaps(
-                              [lineSO(yearChart, monthChart), lineSJ(yearChart, monthChart), lineTagihan(yearChart, monthChart)],
-                              [Colors.green , Colors.lightBlue, Colors.red],
+                              [lineChartSO, lineChartSJ, lineChartTG],
+                              [Colors.blue , Colors.orange, Colors.green],
                               ['', '', '']),
                           key: UniqueKey(),
                         ), //Unique key to force animations
@@ -774,17 +778,17 @@ class _Omset extends State<Omset> {
                     runAlignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: <Widget>[
-                      Icon(Icons.stop, color: Colors.green),
+                      Icon(Icons.stop, color: Colors.blue),
                       Text(' : SO (Jt)'),
                       const SizedBox(
                         width: 10,
                       ),
-                      Icon(Icons.stop, color: Colors.lightBlue),
+                      Icon(Icons.stop, color: Colors.orange),
                       Text(' : SJ (Jt)'),
                       const SizedBox(
                         width: 10,
                       ),
-                      Icon(Icons.stop, color: Colors.red),
+                      Icon(Icons.stop, color: Colors.green),
                       Text(' : Tagihan (Jt)'),
                     ],
                   ),
@@ -794,6 +798,11 @@ class _Omset extends State<Omset> {
                 ]
             ),
           ],
+        ) :
+        Text('No Data Available',
+            style: TextStyle(
+              color: darkBlue, fontSize: 18),
+            textAlign: TextAlign.center
         ),
       ),
     );
@@ -823,6 +832,13 @@ class _Omset extends State<Omset> {
               _sort<String>(
                       (OmsetModel d) => d.nama_regional, columnIndex,
                   ascending),
+        ),
+        DataColumn(
+          label: const Text('Day'),
+          onSort: (int columnIndex, bool ascending) =>
+              _sort<num>(
+                      (OmsetModel d) => d.persentase_harian,
+                  columnIndex, ascending),
         ),
         DataColumn(
           label: const Text('MTD'),
@@ -1029,7 +1045,7 @@ class _Omset extends State<Omset> {
                 ),
               ],
             ),
-            child: Column(
+            child: listBrand.length > 0 ? Column(
               children: [
                 for ( var i in listBrand )
                   Padding(
@@ -1101,6 +1117,10 @@ class _Omset extends State<Omset> {
                     ),*/
                   ),
               ],
+            ) :
+            Text('No Data Available',
+              style: TextStyle(
+                  fontSize: 18, color: Colors.white),
             ),
           ),
         ]
