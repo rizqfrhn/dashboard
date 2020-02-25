@@ -49,7 +49,7 @@ class _MyDrawer extends State<MyDrawer> {
       case 0:
         return Omset(nik: widget.nik);
       case 1:
-        return DashboardSCM();
+        return DashboardSCM(nik: widget.nik, periode: '', lokasi: '');
       /*case 2:
         return Dashboard();
       case 3:
