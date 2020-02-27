@@ -38,6 +38,7 @@ List<OmsetTagihModel> listTagihan = [];
 List<PeriodeModel> listPeriode = [];
 List<BrandModel> listBrand = [];
 List<TokoModel> listToko = [];
+List<RuteModel> listRute = [];
 List<OmsetCallECModel> listCallEC = [];
 List<OmsetLineChartModel> listLineChart = [];
 Map<DateTime, double> lineChartSO = lineSO();
@@ -49,7 +50,8 @@ PeriodeModel periodeSelection;
 double target = 0, realisasi = 0, persentase = 0,
     targetHari = 0, realisasiHari = 0, persentaseHari = 0;
 double so = 0, sj = 0, fk = 0, persentase_kirim = 0, persentase_faktur = 0;
-double totalToko = 0, totalOrderSO = 0, persentaseToko = 0;
+double totalToko = 0, totalOrderSO = 0, persentaseToko = 0, totalRute = 0,
+    totalTokoRute = 0, persentaseRute = 0;
 double targetTagihan = 0, totalBayar = 0, persentaseTagihan = 0,
     targetTagihanHari = 0, totalBayarHari = 0, persentaseTagihanHari = 0;
 double targetOmset = 0, rataCall = 0, rataEC = 0,
@@ -59,6 +61,29 @@ double targetOmsetLast = 0, rataCallLast = 0, rataECLast = 0,
 var now = new DateTime.now();
 int monthChart = now.month;
 int yearChart = now.year;
+
+Default() {
+  list.clear();
+  listSO.clear();
+  listTagihan.clear();
+  listPeriode.clear();
+  listBrand.clear();
+  listToko.clear();
+  listCallEC.clear();
+  listLineChart.clear();
+  listRute.clear();
+  target = 0; realisasi = 0; persentase = 0;
+  targetHari = 0; realisasiHari = 0; persentaseHari = 0;
+  so = 0; sj = 0; fk = 0; persentase_kirim = 0; persentase_faktur = 0;
+  totalToko = 0; totalOrderSO = 0; persentaseToko = 0; totalRute = 0;
+  totalTokoRute = 0; persentaseRute = 0;
+  targetTagihan = 0; totalBayar = 0; persentaseTagihan = 0;
+  targetTagihanHari = 0; totalBayarHari = 0; persentaseTagihanHari = 0;
+  targetOmset = 0; rataCall = 0; rataEC = 0;
+  rataFk = 0; jumlahSales = 0; estimasiPersentase = 0;
+  targetOmsetLast = 0; rataCallLast = 0; rataECLast = 0;
+  rataFkLast = 0; jumlahSalesLast = 0; estimasiPersentaseLast = 0;
+}
 
 fetchDataChart(String nik, String periode) async {
   Map dataParam = {
@@ -129,6 +154,101 @@ fetchDataCallEC(String nik, String periode) async {
   }
 }
 
+fetchDataDsToko(String nik, String periode) async {
+// Detail Toko
+  Map dataToko = {
+    'lokasi': '',
+    'periode': periode,
+    'nik': nik,
+    'nikSales' : ''
+  };
+
+  var responseToko =
+  await http.post(
+      '${url}/GetDataPersentaseToko?',
+      body: dataToko);
+  if (responseToko.statusCode == 200) {
+    listToko = (json.decode(responseToko.body)['Table'] as List)
+        .map((data) => new TokoModel.fromJson(data))
+        .toList();
+    totalToko = listToko[0].total;
+    totalOrderSO = listToko[0].total_order_so;
+    persentaseToko = listToko[0].persentase;
+  }
+}
+
+fetchDataRute(String nik, String periode) async {
+// Detail Toko
+  Map dataRute = {
+    'lokasi': '',
+    'periode': periode,
+    'nik': nik,
+  };
+
+  var responseRute =
+  await http.post(
+      '${url}/GetSumRuteToko?',
+      body: dataRute);
+  if (responseRute.statusCode == 200) {
+    listRute = (json.decode(responseRute.body)['Table'] as List)
+        .map((data) => new RuteModel.fromJson(data))
+        .toList();
+    totalRute = listRute[0].total_rute;
+    totalTokoRute = listRute[0].total_toko;
+    persentaseRute = listRute[0].persentase;
+  }
+}
+
+fetchDataTagihan(String nik, String periode) async {
+  Map dataOmset = {
+    'lokasi': '',
+    'tahun': '',
+    'minggu': '',
+    'nik': nik,
+    'periode': periode
+  };
+
+  var responseTagihan =
+  await http.post(
+      '${url}/GetWidgetDashboardTagihanTotal?',
+      body: dataOmset);
+  if (responseTagihan.statusCode == 200) {
+    listTagihan = (json.decode(responseTagihan.body)['Table'] as List)
+        .map((data) => new OmsetTagihModel.fromJson(data))
+        .toList();
+    targetTagihan = listTagihan[0].target_tagih;
+    totalBayar = listTagihan[0].total_bayar;
+    persentaseTagihan = listTagihan[0].persentase;
+    targetTagihanHari = listTagihan[0].target_hari;
+    totalBayarHari = listTagihan[0].total_bayar_hari;
+    persentaseTagihanHari = listTagihan[0].persentase_hari;
+  }
+}
+
+fetchDataSO(String nik, String periode) async {
+// Detail SO
+  Map dataParam = {
+    'lokasi': '',
+    'nik': nik,
+    'periode': periode
+  };
+
+  var responseSO =
+  await http.post(
+      '${url}/GetWidgetOrder?',
+      body: dataParam);
+  if (responseSO.statusCode == 200) {
+    listSO = (json.decode(responseSO.body)['Table'] as List)
+        .map((data) => new OmsetSOModel.fromJson(data))
+        .toList();
+    so = listSO[0].so;
+    sj = listSO[0].sj;
+    fk = listSO[0].fk;
+    persentase_kirim = listSO[0].persentase_kirim;
+    persentase_faktur = listSO[0].persentase_faktur;
+  }
+}
+
 fetchData(String nik, String periode) async {
 // Detail Omset & Tagihan
   Map dataOmset = {
@@ -153,65 +273,6 @@ fetchData(String nik, String periode) async {
     targetHari = list[0].target_omset_hari;
     realisasiHari = list[0].net_exc_ppn_hari;
     persentaseHari = list[0].persentase_hari;
-  }
-
-  var responseTagihan =
-  await http.post(
-      '${url}/GetWidgetDashboardTagihanTotal?',
-      body: dataOmset);
-  if (responseTagihan.statusCode == 200) {
-    listTagihan = (json.decode(responseTagihan.body)['Table'] as List)
-        .map((data) => new OmsetTagihModel.fromJson(data))
-        .toList();
-    targetTagihan = listTagihan[0].target_tagih;
-    totalBayar = listTagihan[0].total_bayar;
-    persentaseTagihan = listTagihan[0].persentase;
-    targetTagihanHari = listTagihan[0].target_hari;
-    totalBayarHari = listTagihan[0].total_bayar_hari;
-    persentaseTagihanHari = listTagihan[0].persentase_hari;
-  }
-
-// Detail SO
-  Map dataParam = {
-    'lokasi': '',
-    'nik': nik,
-    'periode': periode
-  };
-
-  var responseSO =
-  await http.post(
-      '${url}/GetWidgetOrder?',
-      body: dataParam);
-  if (responseSO.statusCode == 200) {
-    listSO = (json.decode(responseSO.body)['Table'] as List)
-        .map((data) => new OmsetSOModel.fromJson(data))
-        .toList();
-    so = listSO[0].so;
-    sj = listSO[0].sj;
-    fk = listSO[0].fk;
-    persentase_kirim = listSO[0].persentase_kirim;
-    persentase_faktur = listSO[0].persentase_faktur;
-  }
-
-// Detail Toko
-  Map dataToko = {
-    'lokasi': '',
-    'periode': periode,
-    'nik': nik,
-    'nikSales' : ''
-  };
-
-  var responseToko =
-  await http.post(
-      '${url}/GetDataPersentaseToko?',
-      body: dataToko);
-  if (responseToko.statusCode == 200) {
-    listToko = (json.decode(responseToko.body)['Table'] as List)
-        .map((data) => new TokoModel.fromJson(data))
-        .toList();
-    totalToko = listToko[0].total;
-    totalOrderSO = listToko[0].total_order_so;
-    persentaseToko = listToko[0].persentase;
   }
 
 // Periode
@@ -709,6 +770,38 @@ class OmsetAreaDataSource extends DataTableSource {
             nik: nik,
             periode: periode,)),
         );}),
+        DataCell(
+            Padding(
+              padding: EdgeInsets.all(0.0),
+              child: new LinearPercentIndicator(
+                width: 75,
+                animation: true,
+                lineHeight: 20.0,
+                animationDuration: 2000,
+                percent: omsetArea.persentase_harian / 100 <= 0.0
+                    ? 0.0
+                    : omsetArea.persentase_harian / 100 >= 1.0
+                    ? 1.0
+                    : omsetArea.persentase_harian / 100,
+                center: Text('${omsetArea.persentase_harian.toStringAsFixed(2)}%',
+                    style: TextStyle(color: Colors.white)),
+                linearStrokeCap: LinearStrokeCap.roundAll,
+                progressColor: omsetArea.persentase_harian <= 80
+                    ? Colors.red : omsetArea.persentase_harian <= 90
+                    ? Colors.orange
+                    : Colors.green,
+              ),
+            ),
+            onTap: () { Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => OmsetSales(
+                areaKey: omsetArea.area_key,
+                areaName: omsetArea.nama_area,
+                nik: nik,
+                periode: periode,)),
+            );
+            }
+        ),
         DataCell(
             Padding(
               padding: EdgeInsets.all(0.0),

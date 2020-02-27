@@ -124,7 +124,7 @@ class _OmsetSales extends State<OmsetSales> {
               ascending),
         ),
         DataColumn(
-          label: const Text('Status'),
+          label: const Text('MTD'),
           onSort: (int columnIndex, bool ascending) => _sort<num>(
                   (OmsetSalesModel d) => d.persentase_omset,
               columnIndex,

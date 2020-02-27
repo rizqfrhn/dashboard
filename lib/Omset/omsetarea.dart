@@ -122,7 +122,14 @@ class _OmsetArea extends State<OmsetArea> {
               ascending),
         ),
         DataColumn(
-          label: const Text('Status'),
+          label: const Text('Day'),
+          onSort: (int columnIndex, bool ascending) => _sort<num>(
+                  (OmsetAreaModel d) => d.persentase_harian,
+              columnIndex,
+              ascending),
+        ),
+        DataColumn(
+          label: const Text('MTD'),
           onSort: (int columnIndex, bool ascending) => _sort<num>(
                   (OmsetAreaModel d) => d.persentase,
               columnIndex,

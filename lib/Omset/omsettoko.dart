@@ -133,7 +133,7 @@ class _OmsetToko extends State<OmsetToko> {
               ascending),
         ),
         DataColumn(
-          label: const Text('Status'),
+          label: const Text('MTD'),
           onSort: (int columnIndex, bool ascending) => _sort<num>(
                   (OmsetTokoModel d) => d.persentase_omset,
               columnIndex,

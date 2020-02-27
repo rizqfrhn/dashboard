@@ -89,13 +89,13 @@ class _Omset extends State<Omset> {
     setState(() {
       _fetchData(periode);
       fetchData(nik, periode);
+      fetchDataTagihan(nik, periode);
+      fetchDataSO(nik, periode);
       fetchDataChart(nik, periode);
       fetchDataBrand(nik, periode);
       fetchDataCallEC(nik, periode);
-      /*fetchDataSO(nik, periode);
-      fetchBrand(nik, periode);
-      fetchToko(nik, periode);
-      fetchDataPeriode();*/
+      fetchDataDsToko(nik, periode);
+      fetchDataRute(nik, periode);
       loading = false;
     });
 
@@ -149,7 +149,7 @@ class _Omset extends State<Omset> {
                           DetailOmset('Omset', 'Real', 'Target', realisasi, target, persentase),
                           DetailOmset('Tagihan', 'Real', 'Target', totalBayar, targetTagihan, persentaseTagihan),
                           DetailOmset('SO SJ', 'SJ', 'SO', sj, so, persentase_kirim),
-                          liquidChart(),
+                          OrderRute(),
                           /*MtDSection(),*/
                         ]
                     ),
@@ -166,8 +166,8 @@ class _Omset extends State<Omset> {
                   ],
                 ),
               ),
-              /*lineChart(),
-              SizedBox(
+              liquidChart(),
+              /*SizedBox(
                 height: 15,
               ),*/
               lineChart_(),
@@ -201,6 +201,7 @@ class _Omset extends State<Omset> {
         onChanged: (newValue) {
           setState(() {
             /*debugPrint('VAL = $newValue');*/
+            Default();
             periode = newValue;
             monthFormat = new DateFormat("MMMM").format(DateTime.parse
               ('${listperiode.TAHUN}-${listperiode.BULAN}-01'));
@@ -209,12 +210,6 @@ class _Omset extends State<Omset> {
             monthChart = int.parse(listperiode.BULAN);
             yearChart = int.parse(listperiode.TAHUN);
             refreshList();
-            new Timer.periodic(Duration(seconds: 5),  (Timer rfs) =>
-                setState((){
-                  refreshList();
-                  rfs.cancel();
-                })
-            );
             Navigator.of(context).pop();
           });
         },
@@ -294,10 +289,13 @@ class _Omset extends State<Omset> {
 
   Container DetailOmset(String title_, String subtitle1_, String subtitle2_,
       double value1_, double value2_, double persentase_) {
+    Orientation orientation = MediaQuery.of(context).orientation;
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.only(bottom: 10.0),
-      width: MediaQuery.of(context).size.width * 0.44,
+      width: orientation == Orientation.portrait
+          ? MediaQuery.of(context).size.width * 0.44
+          : MediaQuery.of(context).size.width * 0.47,
       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
       decoration: new BoxDecoration(
         color: Colors.lightBlue,
@@ -453,11 +451,140 @@ class _Omset extends State<Omset> {
     );
   }
 
-  Container OrderSOToko() {
+  Container OrderRute() {
+    Orientation orientation = MediaQuery.of(context).orientation;
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.only(bottom: 10.0),
-      width: MediaQuery.of(context).size.width * 0.44,
+      width: orientation == Orientation.portrait
+          ? MediaQuery.of(context).size.width * 0.44
+          : MediaQuery.of(context).size.width * 0.47,
+      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+      decoration: new BoxDecoration(
+        color: Colors.lightBlue,
+        shape: BoxShape.rectangle,
+        borderRadius: new BorderRadius.only(
+          topLeft: Radius.circular(5),
+          topRight: Radius.circular(5),
+          bottomLeft: Radius.circular(5),
+          bottomRight: Radius.circular(5),
+        ),
+        boxShadow: <BoxShadow>[
+          new BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10.0,
+            offset: new Offset(0.0, 10.0),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              Text('Rute Kirim', style: TextStyle(fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white)),
+              SizedBox(
+                height: 7.5,
+              ),
+              Wrap(
+                spacing: 10.0,
+                runSpacing: 5.0,
+                children: <Widget>[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text('Rute',
+                          style: TextStyle(color: Colors.white)),
+                      SizedBox(
+                        height: 5.0,
+                      ),
+                      Text('${numformat.format(totalRute)}',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text('',
+                          style: TextStyle(color: Colors.white)),
+                      SizedBox(
+                        height: 5.0,
+                      ),
+                      Text(' / ',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text('Toko',
+                          style: TextStyle(color: Colors.white)),
+                      SizedBox(
+                        height: 5.0,
+                      ),
+                      Text('${numformat.format(totalTokoRute)}',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 5.0,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.3,
+                child: new LinearPercentIndicator(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  alignment: MainAxisAlignment.center,
+                  animation: true,
+                  lineHeight: 20.0,
+                  animationDuration: 2000,
+                  percent: 1.0,
+                  center: Text('${persentaseRute.toStringAsFixed(2)} %', style: TextStyle(color: Colors.white)),
+                  linearStrokeCap: LinearStrokeCap.roundAll,
+                  progressColor: persentaseRute <= 80 ? Colors.red :
+                  persentaseRute <= 90 ? Colors.orange :
+                  Colors.green,
+                ),
+              ),
+              SizedBox(
+                height: 7.5,
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                child: new LinearPercentIndicator(
+                  animation: true,
+                  backgroundColor: Colors.white,
+                  lineHeight: 2.0,
+                  animationDuration: 2000,
+                  percent: persentaseRute / 100 <= 0.0 ? 0.0 :
+                  persentaseRute / 100 >= 1.0 ? 1.0 :
+                  persentaseRute / 100,
+                  linearStrokeCap: LinearStrokeCap.roundAll,
+                  progressColor: persentaseRute <= 80 ? Colors.red :
+                  persentaseRute <= 90 ? Colors.orange :
+                  Colors.green,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container OrderSOToko() {
+    Orientation orientation = MediaQuery.of(context).orientation;
+    return Container(
+      alignment: Alignment.center,
+      margin: EdgeInsets.only(bottom: 10.0),
+      width: orientation == Orientation.portrait
+          ? MediaQuery.of(context).size.width * 0.44
+          : MediaQuery.of(context).size.width * 0.47,
       padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
       decoration: new BoxDecoration(
         color: Colors.lightBlue,
@@ -609,16 +736,15 @@ class _Omset extends State<Omset> {
   Container liquidChart() {
     Orientation orientation = MediaQuery.of(context).orientation;
     return Container(
-      margin: EdgeInsets.only(top: 7.5, bottom: 7.5),
-      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
+      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
       child: Center(
         child: SizedBox(
           width: orientation == Orientation.portrait
-              ? MediaQuery.of(context).size.width * 0.29
-              :  MediaQuery.of(context).size.height * 0.3,
+              ? MediaQuery.of(context).size.width * 0.4
+              :  MediaQuery.of(context).size.height * 0.5,
           height: orientation == Orientation.portrait
-              ? MediaQuery.of(context).size.width * 0.29
-              :  MediaQuery.of(context).size.height * 0.3,
+              ? MediaQuery.of(context).size.width * 0.4
+              :  MediaQuery.of(context).size.height * 0.5,
           child: LiquidCircularProgressIndicator(
             value: persentase / 100 <= 0.0 ? 0.0 :
             persentase / 100 >= 1.0 ? 1.0 :

@@ -1,5 +1,8 @@
 /*import 'package:dashboard/Login/Login.dart';*/
 //import 'package:dashboard/Login/loginauth.dart';
+import 'package:mobilesfa/Omset/omsetcontroller.dart';
+import 'package:mobilesfa/Omset/omsetmodel.dart';
+
 import 'Login/signin.dart';
 import 'package:mobilesfa/Omset/omset.dart';
 import 'UI/json.dart';
@@ -81,9 +84,12 @@ class _MyDrawer extends State<MyDrawer> {
               style: TextStyle(fontSize: 18)),
           /*trailing: new Icon(Icons.arrow_right),*/
           selected: i == _selectedDrawerIndex,
-          onTap: d.title == 'Logout' ?
-              () {Navigator.push(context, MaterialPageRoute(
-              builder: (context) => SignIn()),);}
+          onTap: d.title == 'Logout'
+              ? () {
+            Default();
+            Navigator.push(context, MaterialPageRoute(
+                builder: (context) => SignIn()),);
+          }
               : () => _onSelectItem(i),
         ),
       );
@@ -106,9 +112,11 @@ class _MyDrawer extends State<MyDrawer> {
               ),
             ],
             onSelected: (int value){
-              if(value == 1)
+              if(value == 1) {
+                Default();
                 Navigator.push(context, MaterialPageRoute(
                     builder: (context) => SignIn()));
+              }
             },
           ),
         ],

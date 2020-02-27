@@ -134,6 +134,24 @@ class TokoModel {
   }
 }
 
+class RuteModel {
+  final double total_rute;
+  final double total_toko;
+  final double persentase;
+
+  RuteModel({ this.total_rute
+    , this.total_toko
+    , this.persentase});
+
+  factory RuteModel.fromJson(Map<String, dynamic> json) {
+    return new RuteModel(
+      total_rute: json['total_rute'] == null ? 0 : json['total_rute'].toDouble(),
+      total_toko: json['total_toko'] == null ? 0 : json['total_toko'].toDouble(),
+      persentase: json['persentase'] == null ? 0 : json['persentase'].toDouble(),
+    );
+  }
+}
+
 class BrandModel {
   final String kode_jenis_merk;
   final double jumlah_toko;
@@ -309,6 +327,10 @@ class OmsetAreaModel {
   final String nama_area;
   final String urut;
   final double nomor;
+  final double target_omset_harian;
+  final double target_volume_harian;
+  final double net_exc_ppn_harian;
+  final double persentase_harian;
 
   bool selected = false;
 
@@ -321,7 +343,11 @@ class OmsetAreaModel {
     , this.persentase
     , this.nama_area
     , this.urut
-    , this.nomor});
+    , this.nomor
+    , this.target_omset_harian
+    , this.target_volume_harian
+    , this.net_exc_ppn_harian
+    , this.persentase_harian});
 
   factory OmsetAreaModel.fromJson(Map<String, dynamic> json) {
     return new OmsetAreaModel(
@@ -335,6 +361,10 @@ class OmsetAreaModel {
       nama_area: json['nama_area'],
       urut: json['urut'],
       nomor: json['nomor'] == null ? 0 : json['nomor'].toDouble(),
+      target_omset_harian: json['target_omset_harian'] == null ? 0 : json['target_omset_harian'].toDouble(),
+      target_volume_harian: json['target_volume_harian'] == null ? 0 : json['target_volume_harian'].toDouble(),
+      net_exc_ppn_harian: json['net_exc_ppn_harian'] == null ? 0 : json['net_exc_ppn_harian'].toDouble(),
+      persentase_harian: json['persentase_harian'] == null ? 0 : json['persentase_harian'].toDouble(),
     );
   }
 }
