@@ -17,6 +17,7 @@ class SignIn extends StatefulWidget {
 class _LoginPageState extends State<SignIn> {
   List<LoginModel> _list = List();
   bool _isLoading = false;
+  bool passwordVisible;
   final TextEditingController userController = new TextEditingController();
   final TextEditingController passwordController = new TextEditingController();
 
@@ -26,6 +27,11 @@ class _LoginPageState extends State<SignIn> {
   _fieldFocusChange(BuildContext context, FocusNode currentFocus,FocusNode nextFocus) {
     currentFocus.unfocus();
     FocusScope.of(context).requestFocus(nextFocus);
+  }
+
+  @override
+  void initState() {
+    passwordVisible = true;
   }
 
   signIn(String nik, pass) async {
@@ -90,7 +96,7 @@ class _LoginPageState extends State<SignIn> {
           child: Column(
             children: <Widget>[
               Container(
-                height: MediaQuery.of(context).size.height/2.1,
+                height: MediaQuery.of(context).size.height * 0.4,
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(horizontal: 12),
                 padding: const EdgeInsets.all(16),
@@ -131,7 +137,7 @@ class _LoginPageState extends State<SignIn> {
               ),
 
               Container(
-                /*height: MediaQuery.of(context).size.height/1.92,*/
+                /*height: MediaQuery.of(context).size.height * 1.0,*/
                 width: MediaQuery.of(context).size.width,
                 child: Padding(
                   padding: EdgeInsets.all(23),
@@ -165,7 +171,7 @@ class _LoginPageState extends State<SignIn> {
                         color: Color(0xfff5f5f5),
                         child: TextFormField(
                           controller: passwordController,
-                          obscureText: true,
+                          obscureText: passwordVisible,
                           focusNode: _passwordFocus,
                           onFieldSubmitted: (value){
                             _passwordFocus.unfocus();
@@ -174,12 +180,27 @@ class _LoginPageState extends State<SignIn> {
                               color: Colors.black,
                           ),
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Password',
-                              prefixIcon: Icon(Icons.lock_outline),
-                              labelStyle: TextStyle(
-                                  fontSize: 15
-                              )
+                            border: OutlineInputBorder(),
+                            labelText: 'Password',
+                            prefixIcon: Icon(Icons.lock_outline),
+                            labelStyle: TextStyle(
+                                fontSize: 15
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                // Based on passwordVisible state choose the icon
+                                passwordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Theme.of(context).primaryColorDark,
+                              ),
+                              onPressed: () {
+                                // Update the state i.e. toogle the state of passwordVisible variable
+                                setState(() {
+                                  passwordVisible = !passwordVisible;
+                                });
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -189,7 +210,7 @@ class _LoginPageState extends State<SignIn> {
                         /*padding: EdgeInsets.symmetric(horizontal: 15.0),*/
                         margin: EdgeInsets.only(top: 50.0),
                         child: RaisedButton(
-                          onPressed: userController.text == "" || passwordController.text == "" ? (){
+                          onPressed: /*userController.text == "" || passwordController.text == "" ? (){
                             setState(() {
                               _isLoading = false;
                               Flushbar(
@@ -197,7 +218,7 @@ class _LoginPageState extends State<SignIn> {
                                 message: 'Username or Password cannot be blank!',
                                 duration: Duration(seconds: 3),
                               )..show(context);
-                            });} : () {
+                            });} :*/ () {
                             setState(() {
                               _isLoading = true;
                             });
