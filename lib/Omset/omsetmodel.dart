@@ -23,8 +23,8 @@ class OmsetModel {
 
   factory OmsetModel.fromJson(Map<String, dynamic> json) {
     return new OmsetModel(
-      urut: json['urut'],
-      nama_regional: json['nama_regional'],
+      urut: json['urut'] == null ? '' : json['urut'],
+      nama_regional: json['nama_regional'] == null ? '' : json['nama_regional'],
       target_omset: json['target_omset'] == null ? 0 : json['target_omset'].toDouble(),
       target_volume: json['target_volume'] == null ? 0 : json['target_volume'].toDouble(),
       net_exc_ppn: json['net_exc_ppn'] == null ? 0 : json['net_exc_ppn'].toDouble(),
@@ -85,7 +85,7 @@ class OmsetSOModel {
 
   factory OmsetSOModel.fromJson(Map<String, dynamic> json) {
     return new OmsetSOModel(
-      kode_periode: json['kode_periode'],
+      kode_periode: json['kode_periode'] == null ? '' : json['kode_periode'],
       so: json['so'] == null ? 0 : json['so'].toDouble(),
       sj: json['sj'] == null ? 0 : json['sj'].toDouble(),
       fk: json['fk'] == null ? 0 : json['fk'].toDouble(),
@@ -108,10 +108,10 @@ class PeriodeModel {
 
   factory PeriodeModel.fromJson(Map<String, dynamic> json) {
     return new PeriodeModel(
-      kode_periode: json['kode_periode'],
-      TAHUN: json['TAHUN'],
-      BULAN: json['BULAN'],
-      KODE_PERIODE1: json['KODE_PERIODE1'],
+      kode_periode: json['kode_periode'] == null ? '' : json['kode_periode'],
+      TAHUN: json['TAHUN'] == null ? '' : json['TAHUN'],
+      BULAN: json['BULAN'] == null ? '' : json['BULAN'],
+      KODE_PERIODE1: json['KODE_PERIODE1'] == null ? '' : json['KODE_PERIODE1'],
     );
   }
 }
@@ -179,9 +179,9 @@ class BrandModel {
 
   factory BrandModel.fromJson(Map<String, dynamic> json) {
     return new BrandModel(
-      kode_jenis_merk: json['kode_jenis_merk'],
+      kode_jenis_merk: json['kode_jenis_merk'] == null ? '' : json['kode_jenis_merk'],
       jumlah_toko: json['jumlah_toko'] == null ? 0 : json['jumlah_toko'].toDouble(),
-      jenis_merk: json['jenis_merk'],
+      jenis_merk: json['jenis_merk'] == null ? '' : json['jenis_merk'],
       jumlah: json['jumlah'] == null ? 0 : json['jumlah'].toDouble(),
       omset: json['omset'] == null ? 0 : json['omset'].toDouble(),
       berat: json['berat'] == null ? 0 : json['berat'].toDouble(),
@@ -213,7 +213,7 @@ class OmsetTagihModel {
 
   factory OmsetTagihModel.fromJson(Map<String, dynamic> json) {
     return new OmsetTagihModel(
-      kode: json['kode'],
+      kode: json['kode'] == null ? '' : json['kode'],
       target_tagih: json['target_tagih'] == null ? 0 : json['target_tagih'].toDouble(),
       total_bayar: json['total_bayar'] == null ? 0 : json['total_bayar'].toDouble(),
       persentase: json['persentase'] == null ? 0 : json['persentase'].toDouble(),
@@ -255,7 +255,7 @@ class OmsetCallECModel {
 
   factory OmsetCallECModel.fromJson(Map<String, dynamic> json) {
     return new OmsetCallECModel(
-      kode_periode: json['kode_periode'],
+      kode_periode: json['kode_periode'] == null ? '' : json['kode_periode'],
       target_omset_last: json['target_omset_last'] == null ? 0 : json['target_omset_last'].toDouble(),
       rata_call_last: json['rata_call_last'] == null ? 0 : json['rata_call_last'].toDouble(),
       rata_ec_last: json['rata_ec_last'] == null ? 0 : json['rata_ec_last'].toDouble(),
@@ -299,7 +299,7 @@ class OmsetLineChartModel {
 
   factory OmsetLineChartModel.fromJson(Map<String, dynamic> json) {
     return new OmsetLineChartModel(
-      kode_periode: json['kode_periode'],
+      kode_periode: json['kode_periode'] == null ? '' : json['kode_periode'],
       tahun: json['tahun'] == null ? 0 : json['tahun'].toInt(),
       bulan: json['tgl'] == null ? 0 : json['bulan'].toInt(),
       tgl: json['tgl'] == null ? 0 : json['tgl'].toInt(),
@@ -351,15 +351,15 @@ class OmsetAreaModel {
 
   factory OmsetAreaModel.fromJson(Map<String, dynamic> json) {
     return new OmsetAreaModel(
-      kode_periode: json['kode_periode'],
-      nama_regional: json['nama_regional'],
-      area_key: json['area_key'],
+      kode_periode: json['kode_periode'] == null ? '' : json['kode_periode'],
+      nama_regional: json['nama_regional'] == null ? '' : json['nama_regional'],
+      area_key: json['area_key'] == null ? '' : json['area_key'],
       target_value: json['target_value'] == null ? 0 : json['target_value'].toDouble(),
       target_volume: json['target_volume'] == null ? 0 : json['target_volume'].toDouble(),
       net_exc_ppn: json['net_exc_ppn'] == null ? 0 : json['net_exc_ppn'].toDouble(),
       persentase: json['persentase'] == null ? 0 : json['persentase'].toDouble(),
-      nama_area: json['nama_area'],
-      urut: json['urut'],
+      nama_area: json['nama_area'] == null ? '' : json['nama_area'],
+      urut: json['urut'] == null ? '' : json['urut'],
       nomor: json['nomor'] == null ? 0 : json['nomor'].toDouble(),
       target_omset_harian: json['target_omset_harian'] == null ? 0 : json['target_omset_harian'].toDouble(),
       target_volume_harian: json['target_volume_harian'] == null ? 0 : json['target_volume_harian'].toDouble(),
@@ -420,12 +420,12 @@ class OmsetSalesModel {
 
   factory OmsetSalesModel.fromJson(Map<String, dynamic> json) {
     return new OmsetSalesModel(
-      kode_periode: json['kode_periode'],
-      kode_regional: json['kode_regional'],
-      nama_regional: json['nama_regional'],
-      area_key: json['area_key'],
-      nik: json['nik'],
-      nama_sales: json['nama_sales'],
+      kode_periode: json['kode_periode'] == null ? '' : json['kode_periode'],
+      kode_regional: json['kode_regional'] == null ? '' : json['kode_regional'],
+      nama_regional: json['nama_regional'] == null ? '' : json['nama_regional'],
+      area_key: json['area_key'] == null ? '' : json['area_key'],
+      nik: json['nik'] == null ? '' : json['nik'],
+      nama_sales: json['nama_sales'] == null ? '' : json['nama_sales'],
       target_tagih: json['target_tagih'] == null ? 0 : json['target_tagih'].toDouble(),
       tunai: json['tunai'] == null ? 0 : json['tunai'].toDouble(),
       transfer: json['transfer'] == null ? 0 : json['transfer'].toDouble(),
@@ -435,8 +435,8 @@ class OmsetSalesModel {
       giro_ganti: json['giro_ganti'] == null ? 0 : json['giro_ganti'].toDouble(),
       total_bayar: json['total_bayar'] == null ? 0 : json['total_bayar'].toDouble(),
       persentase: json['persentase'] == null ? 0 : json['persentase'].toDouble(),
-      nama_area: json['nama_area'],
-      urut: json['urut'],
+      nama_area: json['nama_area'] == null ? '' : json['nama_area'],
+      urut: json['urut'] == null ? '' : json['urut'],
       nomor: json['nomor'] == null ? 0 : json['nomor'].toDouble(),
       target_value: json['target_value'] == null ? 0 : json['target_value'].toDouble() ,
       net_exc_ppn: json['net_exc_ppn'] == null ? 0 : json['net_exc_ppn'].toDouble(),
@@ -472,11 +472,11 @@ class OmsetTokoModel {
 
   factory OmsetTokoModel.fromJson(Map<String, dynamic> json) {
     return new OmsetTokoModel(
-      nik: json['nik'],
-      kode_pelanggan: json['kode_pelanggan'],
-      nama_toko: json['nama_toko'],
-      area_key: json['area_key'],
-      kode_periode: json['kode_periode'],
+      nik: json['nik'] == null ? '' : json['nik'],
+      kode_pelanggan: json['kode_pelanggan'] == null ? '' : json['kode_pelanggan'],
+      nama_toko: json['nama_toko'] == null ? '' : json['nama_toko'],
+      area_key: json['area_key'] == null ? '' : json['area_key'],
+      kode_periode: json['kode_periode'] == null ? '' : json['kode_periode'],
       target_value: json['target_value'] == null ? 0 : json['target_value'].toDouble(),
       net_exc_ppn: json['net_exc_ppn'] == null ? 0 : json['net_exc_ppn'].toDouble(),
       persentase_omset: json['persentase_omset'] == null ? 0 : json['persentase_omset'].toDouble(),
