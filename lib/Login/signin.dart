@@ -17,8 +17,22 @@ class SignIn extends StatefulWidget {
 class _LoginPageState extends State<SignIn> {
   List<LoginModel> _list = List();
   bool _isLoading = false;
+  bool passwordVisible;
   final TextEditingController userController = new TextEditingController();
   final TextEditingController passwordController = new TextEditingController();
+
+  final FocusNode _userFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+
+  @override
+  void initState() {
+    passwordVisible = true;
+  }
+
+  _fieldFocusChange(BuildContext context, FocusNode currentFocus,FocusNode nextFocus) {
+    currentFocus.unfocus();
+    FocusScope.of(context).requestFocus(nextFocus);
+  }
 
   signIn(String nik, pass) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -135,6 +149,10 @@ class _LoginPageState extends State<SignIn> {
                           color: Color(0xfff5f5f5),
                           child: TextFormField(
                             controller: userController,
+                            focusNode: _userFocus,
+                            onFieldSubmitted: (term) {
+                              _fieldFocusChange(context, _userFocus, _passwordFocus);
+                            },
                             style: TextStyle(
                                 color: Colors.black,
                             ),
@@ -153,17 +171,36 @@ class _LoginPageState extends State<SignIn> {
                         color: Color(0xfff5f5f5),
                         child: TextFormField(
                           controller: passwordController,
-                          obscureText: true,
+                          obscureText: passwordVisible,
+                          focusNode: _passwordFocus,
+                          onFieldSubmitted: (value){
+                            _passwordFocus.unfocus();
+                          },
                           style: TextStyle(
                               color: Colors.black,
                           ),
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Password',
-                              prefixIcon: Icon(Icons.lock_outline),
-                              labelStyle: TextStyle(
-                                  fontSize: 15
-                              )
+                            border: OutlineInputBorder(),
+                            labelText: 'Password',
+                            prefixIcon: Icon(Icons.lock_outline),
+                            labelStyle: TextStyle(
+                                fontSize: 15
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                // Based on passwordVisible state choose the icon
+                                passwordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Theme.of(context).primaryColorDark,
+                              ),
+                              onPressed: () {
+                                // Update the state i.e. toogle the state of passwordVisible variable
+                                setState(() {
+                                  passwordVisible = !passwordVisible;
+                                });
+                              },
+                            ),
                           ),
                         ),
                       ),
