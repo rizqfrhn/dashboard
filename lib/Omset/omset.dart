@@ -771,70 +771,6 @@ class _Omset extends State<Omset> {
     );
   }
 
-  Widget lineChart() {
-    Orientation orientation = MediaQuery.of(context).orientation;
-    return AspectRatio(
-      aspectRatio: orientation == Orientation.portrait ? 1.5 : 2.5,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(5)),
-          gradient: LinearGradient(
-            colors: [Colors.blue, Colors.lightBlueAccent],
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-          ),
-        ),
-        child: Stack(
-          children: <Widget>[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                const SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  '${monthFormat} ${yearFormat}',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Text(
-                  'Daily Sales',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(
-                  height: 35,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16.0, left: 6.0),
-                    child: mainchart.LineChart(
-                      chartData(),
-                      swapAnimationDuration: Duration(milliseconds: 250),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget lineChart_() {
     Orientation orientation = MediaQuery.of(context).orientation;
     return AspectRatio(
@@ -953,28 +889,28 @@ class _Omset extends State<Omset> {
       /*onSelectAll: _omsetDataSource._selectAll,*/
       columns: <DataColumn>[
         DataColumn(
-          label: const Text('Regional'),
+          label: Text('Regional'),
           onSort: (int columnIndex, bool ascending) =>
               _sort<String>(
                       (OmsetModel d) => d.nama_regional, columnIndex,
                   ascending),
         ),
         DataColumn(
-          label: const Text('Day'),
+          label: Text('Day'),
           onSort: (int columnIndex, bool ascending) =>
               _sort<num>(
                       (OmsetModel d) => d.persentase_harian,
                   columnIndex, ascending),
         ),
         DataColumn(
-          label: const Text('MTD'),
+          label: Text('MTD'),
           onSort: (int columnIndex, bool ascending) =>
               _sort<num>(
                       (OmsetModel d) => d.persentase_bulan,
                   columnIndex, ascending),
         ),
         DataColumn(
-          label: const Text('Target'),
+          label: Text('Target'),
           onSort: (int columnIndex, bool ascending) =>
               _sort<num>(
                       (OmsetModel d) => d.target_omset, columnIndex,
@@ -987,7 +923,7 @@ class _Omset extends State<Omset> {
                     (OmsetModel d) => d.target_volume, columnIndex, ascending),
                   ),*/
         DataColumn(
-          label: const Text('Realisasi'),
+          label: Text('Realisasi'),
           onSort: (int columnIndex, bool ascending) =>
               _sort<num>(
                       (OmsetModel d) => d.net_exc_ppn, columnIndex,

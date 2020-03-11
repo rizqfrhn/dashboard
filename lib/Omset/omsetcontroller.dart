@@ -30,8 +30,6 @@ class FlutterMoneyFormatter {
   }
 }
 
-// OMSET //
-
 List<OmsetTotalModel> list = [];
 List<OmsetSOModel> listSO = [];
 List<OmsetTagihModel> listTagihan = [];
@@ -84,6 +82,8 @@ Default() {
   targetOmsetLast = 0; rataCallLast = 0; rataECLast = 0;
   rataFkLast = 0; jumlahSalesLast = 0; estimasiPersentaseLast = 0;
 }
+
+// OMSET //
 
 fetchDataChart(String nik, String periode) async {
   Map dataParam = {
@@ -286,106 +286,6 @@ fetchData(String nik, String periode) async {
   }
 }
 
-/*fetchDataTotal(String nik, String periode) async {
-  Map data = {
-    'lokasi': '',
-    'tahun': '',
-    'minggu': '',
-    'nik': nik,
-    'periode': periode
-  };
-
-  var response =
-  await http.post(
-      '${url}/GetWidgetDashboardNewOmsetAreaTotal?',
-      body: data);
-  if (response.statusCode == 200) {
-    list = (json.decode(response.body)['Table'] as List)
-        .map((data) => new OmsetTotalModel.fromJson(data))
-        .toList();
-    target = list[0].target_omset;
-    realisasi = list[0].net_exc_ppn;
-    persentase = list[0].persentase;
-    target_hari = list[0].target_omset_hari;
-    realisasi_hari = list[0].net_exc_ppn_hari;
-    persentase_hari = list[0].persentase_hari;
-  }
-}
-
-fetchDataSO(String nik, String periode) async {
-  Map data = {
-    'lokasi': '',
-    'nik': nik,
-    'periode': periode
-  };
-
-  var response =
-  await http.post(
-      '${url}/GetWidgetOrder?',
-      body: data);
-  if (response.statusCode == 200) {
-    listSO = (json.decode(response.body)['Table'] as List)
-        .map((data) => new OmsetSOModel.fromJson(data))
-        .toList();
-    so = listSO[0].so;
-    sj = listSO[0].sj;
-    fk = listSO[0].fk;
-    persentase_kirim = listSO[0].persentase_kirim;
-    persentase_faktur = listSO[0].persentase_faktur;
-  }
-}
-
-fetchToko(String nik, String periode) async {
-  Map data = {
-    'lokasi': '',
-    'periode': periode,
-    'nik': nik,
-    'nikSales' : ''
-  };
-
-  var response =
-  await http.post(
-      '${url}/GetDataPersentaseToko?',
-      body: data);
-  if (response.statusCode == 200) {
-    orderSOlist = (json.decode(response.body)['Table'] as List)
-        .map((data) => new TokoModel.fromJson(data))
-        .toList();
-    totalToko = orderSOlist[0].total;
-    totalOrderSO = orderSOlist[0].total_order_so;
-    persentaseToko = orderSOlist[0].persentase;
-  }
-}
-
-fetchBrand(String nik, String periode) async {
-  Map data = {
-    'lokasi': '',
-    'periode': periode,
-    'nik': nik
-  };
-
-  var response =
-  await http.post(
-      '${url}/GetDataBrandPareto?',
-      body: data);
-  if (response.statusCode == 200) {
-    brandlist = (json.decode(response.body)['Table'] as List)
-        .map((data) => new BrandModel.fromJson(data))
-        .toList();
-  }
-}
-
-fetchDataPeriode() async {
-  var response =
-  await http.post(
-      '${url}/GetDataPeriode');
-  if (response.statusCode == 200) {
-    periodelist = (json.decode(response.body)['Table'] as List)
-        .map((data) => new PeriodeModel.fromJson(data))
-        .toList();
-  }
-}*/
-
 Future<List<OmsetModel>> fetchResultOmset(http.Client client, String nik, String periode) async {
   Map data = {
     'lokasi' : '',
@@ -487,11 +387,6 @@ class OmsetDataSource extends DataTableSource {
             progressColor: omset.persentase_bulan <= 80 ? Colors.red :
             omset.persentase_bulan <= 90 ? Colors.orange :
             Colors.green,
-            /*progressColor: omset.persentase_bulan <= 40 ? Colors.red :
-            omset.persentase_bulan <= 60 ? Colors.amberAccent :
-            omset.persentase_bulan <= 80 ? Colors.lightBlueAccent :
-            omset.persentase_bulan <= 90 ? Colors.lightGreen :
-            Colors.green,*/
           ),
         ), onTap: () {Navigator.push(
           context,
@@ -525,144 +420,6 @@ class OmsetDataSource extends DataTableSource {
     _selectedCount = checked ? _items.length : 0;
     notifyListeners();
   }
-}
-
-LineChartData chartData() {
-  return LineChartData(
-    lineTouchData: LineTouchData(
-      touchTooltipData: LineTouchTooltipData(
-        tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
-      ),
-      touchCallback: (LineTouchResponse touchResponse) {
-        print(touchResponse);
-      },
-      handleBuiltInTouches: true,
-    ),
-    gridData: const FlGridData(
-      show: false,
-    ),
-    titlesData: FlTitlesData(
-      bottomTitles: SideTitles(
-        showTitles: true,
-        reservedSize: 22,
-        textStyle: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-        ),
-        margin: 10,
-        getTitles: (value) {
-          switch (value.toInt()) {
-            case 2:
-              return 'SEPT';
-            case 7:
-              return 'OCT';
-            case 12:
-              return 'DEC';
-          }
-          return '';
-        },
-      ),
-      leftTitles: SideTitles(
-        showTitles: true,
-        textStyle: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-        ),
-        getTitles: (value) {
-          switch (value.toInt()) {
-            case 1:
-              return '1m';
-            case 2:
-              return '2m';
-            case 3:
-              return '3m';
-            case 4:
-              return '5m';
-          }
-          return '';
-        },
-        margin: 8,
-        reservedSize: 30,
-      ),
-    ),
-    borderData: FlBorderData(
-      show: true,
-      border: Border(
-        bottom: BorderSide(
-          color: Colors.white,
-          width: 3,
-        ),
-        left: BorderSide(
-          color: Colors.transparent,
-        ),
-        right: BorderSide(
-          color: Colors.transparent,
-        ),
-        top: BorderSide(
-          color: Colors.transparent,
-        ),
-      ),
-    ),
-    minX: 0,
-    maxX: 14,
-    maxY: 4,
-    minY: 0,
-    lineBarsData: linesBarData(),
-  );
-}
-
-List<LineChartBarData> linesBarData() {
-  LineChartBarData lineChart1 = const LineChartBarData(
-    spots: [
-      FlSpot(1, 1),
-      FlSpot(3, 1.5),
-      FlSpot(5, 1.4),
-      FlSpot(7, 3.4),
-      FlSpot(10, 2),
-      FlSpot(12, 2.2),
-      FlSpot(13, 1.8),
-    ],
-    isCurved: true,
-    colors: [
-      Color(0xff4af699),
-    ],
-    barWidth: 8,
-    isStrokeCapRound: true,
-    dotData: FlDotData(
-      show: false,
-    ),
-    belowBarData: BarAreaData(
-      show: false,
-    ),
-  );
-  final LineChartBarData lineChart2 = LineChartBarData(
-    spots: [
-      FlSpot(1, 1),
-      FlSpot(3, 2.8),
-      FlSpot(7, 1.2),
-      FlSpot(10, 2.8),
-      FlSpot(12, 2.6),
-      FlSpot(13, 3.9),
-    ],
-    isCurved: true,
-    colors: [
-      Color(0xffaa4cfc),
-    ],
-    barWidth: 8,
-    isStrokeCapRound: true,
-    dotData: FlDotData(
-      show: false,
-    ),
-    belowBarData: BarAreaData(show: false, colors: [
-      Color(0x00aa4cfc),
-    ]),
-  );
-  return [
-    lineChart1,
-    lineChart2,
-  ];
 }
 
 Map<DateTime, double> lineSO() {
