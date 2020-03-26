@@ -4,16 +4,16 @@ import 'omsetcontroller.dart';
 import '../services.dart';
 import 'dart:convert';
 import 'dart:async';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:fl_chart/fl_chart.dart' as mainchart;
-import 'package:fl_animated_linechart/fl_animated_linechart.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:intl/intl.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 var now = new DateTime.now();
 var year = now.year;
@@ -24,6 +24,7 @@ var monthComboBox = new DateFormat("MMMM").format(now);
 var yearComboBox = new DateFormat("yyyy").format(now);
 final numformat = new NumberFormat("#,###");
 bool isFilter = false;
+String _values = '';
 
 class Omset extends StatefulWidget {
   String nik;
@@ -35,7 +36,7 @@ class Omset extends StatefulWidget {
 }
 
 class _Omset extends State<Omset> {
-  String nik;
+  final String nik;
 
   _Omset({Key key, @required this.nik});
 
@@ -72,8 +73,8 @@ class _Omset extends State<Omset> {
       refreshList();
       new Timer.periodic(Duration(seconds: 20),  (Timer firstTime) =>
           setState((){
-              refreshList();
-              firstTime.cancel();
+            refreshList();
+            firstTime.cancel();
           })
       );
       new Timer.periodic(Duration(seconds: 300),  (Timer t) => setState((){refreshList();}));
@@ -96,6 +97,8 @@ class _Omset extends State<Omset> {
       fetchDataCallEC(nik, periode);
       fetchDataDsToko(nik, periode);
       fetchDataRute(nik, periode);
+      fetchDataYTD(nik, periode);
+      fetchDataCst(nik, periode);
       loading = false;
     });
 
@@ -183,6 +186,10 @@ class _Omset extends State<Omset> {
                 height: 15.0,
               ),
               brandView(),
+              SizedBox(
+                height: 15.0,
+              ),
+              cstParetoView(),
             ],
           ),
         ),
@@ -773,6 +780,9 @@ class _Omset extends State<Omset> {
 
   Widget lineChart_() {
     Orientation orientation = MediaQuery.of(context).orientation;
+    final simpleCurrencyFormatter =
+    new charts.BasicNumericTickFormatterSpec.fromNumberFormat(
+        new NumberFormat.compactSimpleCurrency(locale: "in"));
     return AspectRatio(
       aspectRatio: orientation == Orientation.portrait ? 1.25 : 2.5,
       child: Container(
@@ -798,21 +808,10 @@ class _Omset extends State<Omset> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   Text(
-                    '${monthFormat} ${yearFormat}',
-                    style: TextStyle(
-                      color: darkBlue,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    'Daily Sales',
+                    'Trend Sales',
                     style: TextStyle(
                         color: darkBlue,
                         fontSize: 32,
@@ -822,37 +821,73 @@ class _Omset extends State<Omset> {
                   ),
                   const SizedBox(
                     height: 15,
-                  ),
-                  Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 15.0, bottom: 0.0),
-                        child: AnimatedLineChart(
-                          LineChart.fromDateTimeMaps(
-                              [lineChartSO, lineChartSJ, lineChartTG],
-                              [Colors.blue , Colors.orange, Colors.green],
-                              ['', '', '']),
-                          key: UniqueKey(),
-                        ), //Unique key to force animations
-                      )
-                  ),
-                  Wrap(
+                  ),Wrap(
                     alignment: WrapAlignment.center,
                     runAlignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: <Widget>[
-                      Icon(Icons.stop, color: Colors.blue),
-                      Text(' : SO (Jt)'),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Icon(Icons.stop, color: Colors.orange),
-                      Text(' : SJ (Jt)'),
-                      const SizedBox(
-                        width: 10,
-                      ),
                       Icon(Icons.stop, color: Colors.green),
-                      Text(' : Tagihan (Jt)'),
+                      Text(' : ${yearChart - 2}'),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Icon(Icons.stop, color: Colors.red),
+                      Text(' : ${yearChart - 1}'),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Icon(Icons.stop, color: Colors.blue),
+                      Text(' : ${yearChart}'),
                     ],
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 15.0, bottom: 0.0),
+                        child: charts.BarChart(
+                          createData(),
+                          primaryMeasureAxis: new charts.NumericAxisSpec(
+                              tickFormatterSpec: simpleCurrencyFormatter),
+                          animate: true,
+                          behaviors: [new charts.PanAndZoomBehavior()],
+                          barGroupingType: charts.BarGroupingType.grouped,
+                          barRendererDecorator: new charts.BarLabelDecorator<String>(),
+                          domainAxis: new charts.OrdinalAxisSpec(
+                            renderSpec: charts.SmallTickRendererSpec(
+                              // Rotation Here,
+                              labelRotation: 45,
+                            ),
+                          ),
+                        ),/*new charts.LineChart(
+                          createData(),
+                          primaryMeasureAxis: new charts.NumericAxisSpec(
+                              tickFormatterSpec: simpleCurrencyFormatter),
+                          animate: true,
+                          defaultRenderer: new charts.LineRendererConfig(includePoints: true),
+                          selectionModels: [
+                            charts.SelectionModelConfig(
+                                changedListener: (charts.SelectionModel model) {
+                                  setState(() {
+                                    _values = (model.selectedSeries[0].measureFn(model.selectedDatum[0].index)).toString();
+                                  });
+                                }
+                            )
+                          ],
+                          behaviors: [
+                            charts.LinePointHighlighter(
+                                symbolRenderer: Custom(value: _values)
+                            )
+                          ],
+                        ),*//*AnimatedLineChart(
+                          LineChart.fromDateTimeMaps(
+                              [lineChartNow, lineChartLY, lineChart2YB],
+                              [Colors.blue , Colors.orange, Colors.green],
+                              ['', '', '']),
+                          key: UniqueKey(),
+                        ),*///Unique key to force animations
+                      )
                   ),
                   const SizedBox(
                     height: 15,
@@ -863,7 +898,7 @@ class _Omset extends State<Omset> {
         ) :
         Text('No Data Available',
             style: TextStyle(
-              color: darkBlue, fontSize: 18),
+                color: darkBlue, fontSize: 18),
             textAlign: TextAlign.center
         ),
       ),
@@ -1149,7 +1184,8 @@ class _Omset extends State<Omset> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text('${FlutterMoneyFormatter(amount: i.omset).compact}',
+                            Text('${FlutterMoneyFormatter(amount: i.omset).compact} / '
+                                '${FlutterMoneyFormatter(amount: i.omset_last_year).compact}',
                                 style: TextStyle(color: Colors.white)),
                             Text('${numformat.format(i.jumlah_toko_last_year)} Tk / '
                                 '${numformat.format(i.total_toko_last_year)} Tk',
@@ -1179,6 +1215,120 @@ class _Omset extends State<Omset> {
                     ),*/
                   ),
               ],
+            ) :
+            Text('No Data Available',
+              style: TextStyle(
+                  fontSize: 18, color: Colors.white),
+            ),
+          ),
+        ]
+    );
+  }
+
+  Widget cstParetoView(){
+    return new Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: Text("Pareto Pelanggan",
+              style: Theme.of(context)
+                  .textTheme
+                  .title
+                  .apply(color: darkBlue, fontWeightDelta: 2),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: Divider(
+              height: 31,
+              color: darkBlue,
+            ),
+          ),
+          Container(
+            alignment: Alignment.center,
+            margin: EdgeInsets.only(bottom: 10.0),
+            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+            width: MediaQuery.of(context).size.width * 0.95,
+            decoration: new BoxDecoration(
+              color: Colors.lightBlue,
+              shape: BoxShape.rectangle,
+              borderRadius: new BorderRadius.only(
+                topLeft: Radius.circular(5),
+                topRight: Radius.circular(5),
+                bottomLeft: Radius.circular(5),
+                bottomRight: Radius.circular(30),
+              ),
+              boxShadow: <BoxShadow>[
+                new BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10.0,
+                  offset: new Offset(0.0, 10.0),
+                ),
+              ],
+            ),
+            child: listCstParetoMTD.length > 0 ?
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child:  Wrap(
+                alignment: WrapAlignment.start,
+                children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          child: Text('Pelanggan',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
+                      ),
+                      SizedBox(
+                        width: 15,
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.16,
+                        child: Text('This Month',
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
+                      ),
+                      SizedBox(
+                        width: 15,
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.16,
+                        child: Text('Last Month',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    height: 10,
+                  ),
+                  for ( var items in listCstParetoMTD )
+                    Row(
+                      children: <Widget>[
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.41, margin: EdgeInsets.only(bottom: 5.0),
+                            child: Text('${items.nama_toko}',
+                                style: TextStyle(color: Colors.white))
+                        ),
+                        SizedBox(
+                          width: 15,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.16,
+                            child: Text('${FlutterMoneyFormatter(amount: items.omset_mtd).compact}',
+                            style: TextStyle(color: Colors.white))),
+                        SizedBox(
+                          width: 15,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.15,
+                            child: Text('${FlutterMoneyFormatter(amount: items.omset_mtd_min1).compact}',
+                            style: TextStyle(color: Colors.white))),
+                      ],
+                    ),
+                ],
+              ),
             ) :
             Text('No Data Available',
               style: TextStyle(

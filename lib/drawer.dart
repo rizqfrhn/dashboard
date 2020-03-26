@@ -1,19 +1,14 @@
-/*import 'package:dashboard/Login/Login.dart';*/
-//import 'package:dashboard/Login/loginauth.dart';
 import 'package:mobilesfa/Omset/omsetcontroller.dart';
-import 'package:mobilesfa/Omset/omsetmodel.dart';
-
 import 'Login/signin.dart';
 import 'package:mobilesfa/Omset/omset.dart';
-import 'UI/json.dart';
-import 'UI/setting.dart';
-import 'UI/chart.dart';
-import 'UI/table.dart';
-import 'UI/dashboard.dart';
 import 'UI/dashboardscm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+
+var now = new DateTime.now();
+var year = now.year;
+var month = now.month < 10 ? '0' + now.month.toString() : now.month.toString();
 
 class DrawerItem {
   String title;
@@ -46,13 +41,14 @@ class MyDrawer extends StatefulWidget {
 
 class _MyDrawer extends State<MyDrawer> {
   int _selectedDrawerIndex = 0;
+  String periode = 'O${year}${month}';
 
   _getDrawerItemWidget(int pos) {
     switch (pos) {
       case 0:
         return Omset(nik: widget.nik);
       case 1:
-        return DashboardSCM(nik: widget.nik, periode: '', lokasi: '');
+        return DashboardSCM(nik: widget.nik, periode: periode, lokasi: '');
       /*case 2:
         return Dashboard();
       case 3:

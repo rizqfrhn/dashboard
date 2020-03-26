@@ -301,7 +301,7 @@ class OmsetLineChartModel {
     return new OmsetLineChartModel(
       kode_periode: json['kode_periode'] == null ? '' : json['kode_periode'],
       tahun: json['tahun'] == null ? 0 : json['tahun'].toInt(),
-      bulan: json['tgl'] == null ? 0 : json['bulan'].toInt(),
+      bulan: json['bulan'] == null ? 0 : json['bulan'].toInt(),
       tgl: json['tgl'] == null ? 0 : json['tgl'].toInt(),
       total_so: json['total_so'] == null ? 0 : json['total_so'].toDouble(),
       total_qty_bl_jt: json['total_qty_bl_jt'] == null ? 0 : json['total_qty_bl_jt'].toDouble(),
@@ -310,6 +310,63 @@ class OmsetLineChartModel {
       total_harga_sj_last: json['total_harga_sj_last'] == null ? 0 : json['total_harga_sj_last'].toDouble(),
       total_harga_sj_now: json['total_harga_sj_now'] == null ? 0 : json['total_harga_sj_now'].toDouble(),
       total_bayar: json['total_bayar'] == null ? 0 : json['total_bayar'].toDouble(),
+    );
+  }
+}
+
+class OmsetChartYTDModel {
+  final String kode;
+  final double kode_bulan;
+  final String nama_bulan;
+  final double omset_ytd;
+  final double omset_ytd_min1;
+  final double omset_ytd_min2;
+
+  OmsetChartYTDModel({ this.kode
+    , this.kode_bulan
+    , this.nama_bulan
+    , this.omset_ytd
+    , this.omset_ytd_min1
+    , this.omset_ytd_min2});
+
+  factory OmsetChartYTDModel.fromJson(Map<String, dynamic> json) {
+    return new OmsetChartYTDModel(
+      kode: json['kode'] == null ? '' : json['kode'],
+      kode_bulan: json['kode_bulan'] == null ? 0 : json['kode_bulan'].toDouble(),
+      nama_bulan: json['nama_bulan'] == null ? '' : json['nama_bulan'],
+      omset_ytd: json['omset_ytd'] == null ? 0 : json['omset_ytd'].toDouble(),
+      omset_ytd_min1: json['omset_ytd_min1'] == null ? 0 : json['omset_ytd_min1'].toDouble(),
+      omset_ytd_min2: json['omset_ytd_min2'] == null ? 0 : json['omset_ytd_min2'].toDouble(),
+    );
+  }
+}
+
+class OmsetCstParetoMTDModel {
+  final double nomor;
+  final String kode;
+  final String nama_bulan;
+  final String kode_pelanggan;
+  final String nama_toko;
+  final double omset_mtd;
+  final double omset_mtd_min1;
+
+  OmsetCstParetoMTDModel({ this.nomor
+    , this.kode
+    , this.nama_bulan
+    , this.kode_pelanggan
+    , this.nama_toko
+    , this.omset_mtd
+    , this.omset_mtd_min1});
+
+  factory OmsetCstParetoMTDModel.fromJson(Map<String, dynamic> json) {
+    return new OmsetCstParetoMTDModel(
+      nomor: json['nomor'] == null ? 0 : json['nomor'].toDouble(),
+      kode: json['kode'] == null ? '' : json['kode'],
+      nama_bulan: json['nama_bulan'] == null ? '' : json['nama_bulan'],
+      kode_pelanggan: json['kode_pelanggan'] == null ? '' : json['kode_pelanggan'],
+      nama_toko: json['nama_toko'] == null ? '' : json['nama_toko'],
+      omset_mtd: json['omset_mtd'] == null ? 0 : json['omset_mtd'].toDouble(),
+      omset_mtd_min1: json['omset_mtd_min1'] == null ? 0 : json['omset_mtd_min1'].toDouble(),
     );
   }
 }

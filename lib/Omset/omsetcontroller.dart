@@ -1,3 +1,4 @@
+import 'package:mobilesfa/Omset/omset.dart';
 import 'omsetarea.dart';
 import 'omsetsales.dart';
 import 'omsettoko.dart';
@@ -11,7 +12,9 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:fl_chart/fl_chart.dart';
+import 'package:bezier_chart/bezier_chart.dart';
 
 //GENERAL//
 
@@ -28,6 +31,26 @@ class FlutterMoneyFormatter {
     String compacted = NumberFormat.compact(locale: "in").format(amount);
     return '$compacted';
   }
+  String get compactWithout {
+    String compacted = NumberFormat.compact(locale: "in").format(amount);
+    String names = compacted.substring(0,2);
+    if (names.endsWith(",")) {
+      names = names.replaceAll(",", "");
+    };
+    return '${names}';
+  }
+
+  String get compactSymbol {
+    String compacted = NumberFormat.compact(locale: "in").format(amount);
+    String names = '';
+    if (compacted.substring(compacted.length - 1) == 'M')
+    {
+      names = compacted.substring(compacted.length - 1);
+    } else {
+      names = compacted.substring(compacted.length - 2);
+    }
+    return '${names}';
+  }
 }
 
 List<OmsetTotalModel> list = [];
@@ -39,6 +62,8 @@ List<TokoModel> listToko = [];
 List<RuteModel> listRute = [];
 List<OmsetCallECModel> listCallEC = [];
 List<OmsetLineChartModel> listLineChart = [];
+List<OmsetCstParetoMTDModel> listCstParetoMTD = [];
+List<OmsetChartYTDModel> listChartYTD = [];
 Map<DateTime, double> lineChartSO = lineSO();
 Map<DateTime, double> lineChartSJ = lineSJ();
 Map<DateTime, double> lineChartTG = lineTagihan();
@@ -56,7 +81,9 @@ double targetOmset = 0, rataCall = 0, rataEC = 0,
     rataFk = 0, jumlahSales = 0, estimasiPersentase = 0;
 double targetOmsetLast = 0, rataCallLast = 0, rataECLast = 0,
     rataFkLast = 0, jumlahSalesLast = 0, estimasiPersentaseLast = 0;
+double Values = 0;
 var now = new DateTime.now();
+int dayChart = now.day;
 int monthChart = now.month;
 int yearChart = now.year;
 
@@ -70,6 +97,8 @@ Default() {
   listCallEC.clear();
   listLineChart.clear();
   listRute.clear();
+  listCstParetoMTD.clear();
+  listChartYTD.clear();
   target = 0; realisasi = 0; persentase = 0;
   targetHari = 0; realisasiHari = 0; persentaseHari = 0;
   so = 0; sj = 0; fk = 0; persentase_kirim = 0; persentase_faktur = 0;
@@ -80,7 +109,7 @@ Default() {
   targetOmset = 0; rataCall = 0; rataEC = 0;
   rataFk = 0; jumlahSales = 0; estimasiPersentase = 0;
   targetOmsetLast = 0; rataCallLast = 0; rataECLast = 0;
-  rataFkLast = 0; jumlahSalesLast = 0; estimasiPersentaseLast = 0;
+  rataFkLast = 0; jumlahSalesLast = 0; estimasiPersentaseLast = 0; Values = 0;
 }
 
 // OMSET //
@@ -286,6 +315,42 @@ fetchData(String nik, String periode) async {
   }
 }
 
+fetchDataYTD(String nik, String periode) async {
+  Map dataYTD = {
+    'lokasi': '',
+    'nik': nik,
+    'periode': periode
+  };
+
+  var responseYTD =
+  await http.post(
+      '${url}/GetChartOmsetYearToDate?',
+      body: dataYTD);
+  if (responseYTD.statusCode == 200) {
+    listChartYTD = (json.decode(responseYTD.body)['Table'] as List)
+        .map((data) => new OmsetChartYTDModel.fromJson(data))
+        .toList();
+  }
+}
+
+fetchDataCst(String nik, String periode) async {
+  Map dataCst = {
+    'lokasi': '',
+    'nik': nik,
+    'periode': periode
+  };
+
+  var responseCst =
+  await http.post(
+      '${url}/GetPelangganParetoMonthToDate?',
+      body: dataCst);
+  if (responseCst.statusCode == 200) {
+    listCstParetoMTD = (json.decode(responseCst.body)['Table'] as List)
+        .map((data) => new OmsetCstParetoMTDModel.fromJson(data))
+        .toList();
+  }
+}
+
 Future<List<OmsetModel>> fetchResultOmset(http.Client client, String nik, String periode) async {
   Map data = {
     'lokasi' : '',
@@ -459,6 +524,45 @@ Map<DateTime, double> lineTagihan() {
   }
 
   return data;
+}
+
+/*List<DataPoint<double>> values1 = List();
+
+List listTest() {
+  for (var i in listChartYTD) {
+    values1.add(DataPoint<double>(
+        value: i.omset_ytd, xAxis: i.kode_bulan));
+  }
+}*/
+
+List<charts.Series<OmsetChartYTDModel, String>> createData() {
+  return [
+    new charts.Series<OmsetChartYTDModel, String>(
+      id: '${year - 2}',
+      colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
+      domainFn: (OmsetChartYTDModel ty, _) => ty.nama_bulan,
+      measureFn: (OmsetChartYTDModel ty, _) => ty.omset_ytd_min2,
+      data: listChartYTD,
+      labelAccessorFn: (OmsetChartYTDModel ty, _) => '${FlutterMoneyFormatter(amount: ty.omset_ytd_min2).compactWithout}'
+    ),
+    new charts.Series<OmsetChartYTDModel, String>(
+      id: '${year - 1}',
+      colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
+      domainFn: (OmsetChartYTDModel ty, _) => ty.nama_bulan,
+      measureFn: (OmsetChartYTDModel ty, _) => ty.omset_ytd_min1,
+      data: listChartYTD,
+        labelAccessorFn: (OmsetChartYTDModel ty, _) => '${FlutterMoneyFormatter(amount: ty.omset_ytd_min1).compactWithout}'
+    ),
+    new charts.Series<OmsetChartYTDModel, String>(
+      id: '${year}',
+      colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+      domainFn: (OmsetChartYTDModel ty, _) => ty.nama_bulan,
+      measureFn: (OmsetChartYTDModel ty, _) => ty.omset_ytd,
+      data: listChartYTD,
+      /*fillPatternFn: (OmsetChartYTDModel ty, _) => charts.FillPatternType.forwardHatch,*/
+      labelAccessorFn: (OmsetChartYTDModel ty, _) => '${FlutterMoneyFormatter(amount: ty.omset_ytd).compactWithout}'
+    )
+  ];
 }
 
 // OMSET AREA //
